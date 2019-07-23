@@ -1,3 +1,4 @@
+package spack;
 
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class Main extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 //		doGet(request, response);
+		
 		if(request.getParameter("click").equals("log out")) {
 			request.setAttribute("value", "");
 			RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
@@ -66,6 +68,9 @@ public class Main extends HttpServlet {
 			String roundtrip = request.getParameter("roundTrip");
 			String oneway = request.getParameter("oneWay");
 			System.out.println("Hello");
+		}
+		else if(request.getParameter("click").equals("Dashboard")) {
+			System.out.println();
 		}
 	}
 

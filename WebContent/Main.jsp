@@ -31,7 +31,11 @@
 			<table style="height: 32px; float: right;">
 				<tbody>
 					<tr>
-						<td><a href="dashboard" type="submit">${value}</a></td>
+						<td><%%>
+						
+						<input name="click"
+							type="submit" value = Dashboard></input>
+						</td>
 						<td style="width: 37.671875px;"><input name="click"
 							type="submit" value="signup" /></td>
 						<td style="width: 37.671875px;"><input name="click"
