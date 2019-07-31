@@ -6,23 +6,11 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Search your next flight</title>
 </head>
 
 <body>
-	<%-- 		<p>${value}</p>
-		<form action="Main" method="post">
-			<table style="height: 32px; float: right;" width="200">
-				<tbody>
-					<tr>
-					  <td style="width: 37.671875px;"><input name="click" type="submit" value="signup" /></td>
-					  <td style="width: 37.671875px;"><input name="click" type="submit" value="login" /></td>
-					  <td style="width: 37.671875px;"><input name="click" type="submit" value="log out" /></td>
-					</tr>	
-				</tbody>
-			</table>
-		</form>
- --%>
+
 
 	<h2 style="text-align: center;">Ru expedia</h2>
 	<form action="Main" method="post">
@@ -31,10 +19,11 @@
 			<table style="height: 32px; float: right;">
 				<tbody>
 					<tr>
-						<td><%%>
-						
-						<input name="click"
-							type="submit" value = Dashboard></input>
+						<td><p>${value}</p></td>
+					</tr>
+					<tr>
+						<td>
+							<%%> <input name="click" type="submit" value=Dashboard></input>
 						</td>
 						<td style="width: 37.671875px;"><input name="click"
 							type="submit" value="signup" /></td>
@@ -53,33 +42,32 @@
 			<tbody>
 				<tr style="height: 27px;">
 					<td style="width: 74px; height: 27px; text-align: center;">From</td>
-					<td style="width: 74.921875px; height: 27px; text-align: center;"><input
-						name="origin" type="text" /></td>
+					<td style="width: 74.921875px; height: 27px; text-align: center;">
+						<input name="origin" type="text" value=${_origin}>
+					</td>
 					<td style="width: 74px; height: 27px; text-align: center;">To</td>
-					<td style="width: 74.921875px; height: 27px; text-align: center;"><input
-						name="destination" type="text" /></td>
+					<td style="width: 74.921875px; height: 27px; text-align: center;">
+						<input name="destination" type="text" value=${_destination}>
+					</td>
 				</tr>
 				<tr>
 					<td>One Way</td>
-					<td><input name="oneWay" type="checkbox" /></td>
+					<td><input name="oneWayBox" type="checkbox"></td>
 					<td>Round trip</td>
-					<td><input name="roundTrip" type="checkbox" checked /></td>
+					<td><input name="roundTripBox" type="checkbox" checked></td>
 				</tr>
 				<tr>
 					<td style="width: 74px; height: 27px; text-align: center;">When</td>
 					<td style="width: 74.921875px; height: 27px; text-align: center;">
-						<input type="date" name="fromDate"
-						value=<%DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-			Date date = new Date();
-			out.print(dateFormat.format(date));%>>
+						<input type="date" name="fromDate" value=${_fromDate} >
 					</td>
 					<td style="width: 74px; height: 27px; text-align: center;">Return</td>
 					<td style="width: 74.921875px; height: 27px; text-align: center;"><input
-						name="returnDate" type="date" /></td>
+						name="returnDate" type="date" value=${_returnDate}  ></td>
 				</tr>
 			</tbody>
 		</table>
-		<p style="text-align: center;">
+		<p style="text-align: center; color: red; font-size: 15px;">
 			<input name="click" type="submit" value="Search" />
 		</p>
 	</form>

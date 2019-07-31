@@ -9,20 +9,21 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.sql.*;  
 
 /**
  * Servlet implementation class Sign_up
  */
-@WebServlet("/Sign up")
-public class Sign_up extends HttpServlet {
+@WebServlet("/SignUp")
+public class SignUp extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public Sign_up() {
+    public SignUp() {
         super();
         // TODO Auto-generated constructor stub
         //request.getParameter("error");
@@ -33,13 +34,16 @@ public class Sign_up extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		response.getWriter().append("Served at: ").append(request.getContextPath());
-
-		String str = "";
-		str = request.getParameter("error");
-		if(str.length() > 0) {
-			
-		}
+//		response.getWriter().append("Served at: ").append(request.getContextPath());
+//
+//		String str = "";
+//		str = request.getParameter("error");
+//		if(str.length() > 0) {
+//			
+//		}
+		RequestDispatcher dispatcher = request.getRequestDispatcher("Sign up.jsp");
+		dispatcher.forward( request, response);
+		//return;
 	}
 
 	/**
@@ -53,15 +57,13 @@ public class Sign_up extends HttpServlet {
 
 		String password = "";
 		String emailAddress = "";
-		String phone = "";
 
 		
 		firstName = request.getParameter("first_name");
 		lastName = request.getParameter("last_name");
 		
 		password = request.getParameter("password");
-		emailAddress = request.getParameter("address");
-		phone = request.getParameter("contact");
+		emailAddress = request.getParameter("email");
 		
 		
 		boolean isCorrect = true;
@@ -82,16 +84,12 @@ public class Sign_up extends HttpServlet {
 			request.setAttribute("error4", "Please enter an email");
 			isCorrect = false;
 		}
-		if(phone.length() == 0) {
-			request.setAttribute("error5", "Please enter a phone number");
-			isCorrect = false;
-		}
 		
 		if(isCorrect == false) {
 			 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("Sign Up.jsp");
-			dispatcher.forward( request, response);
-			return;
+//			RequestDispatcher dispatcher = request.getRequestDispatcher("Sign up.jsp");
+//			dispatcher.forward( request, response);
+//			return;
 		}
 		
 		try {
@@ -104,26 +102,33 @@ public class Sign_up extends HttpServlet {
 			stmt.setString(1, firstName);
 			stmt.setString(2, lastName);
 			stmt.setString(3, password);
-			stmt.setString(4, "1");
+			stmt.setString(4, "3");
 			stmt.setString(5, emailAddress);
 			
 			int count = stmt.executeUpdate();
 			
 			if(count>0) {
-				
+				//sign up screen is for users only so we can set the account type directly to 3
+				User _user = new User(firstName, emailAddress, 3);
+				HttpSession session = request.getSession();
+				session.setAttribute("username", _user);
 				request.setAttribute("value", "Welcome " + firstName);
-				request.setAttribute("username", emailAddress);
-				dispatcher = request.getRequestDispatcher("Main.jsp");
-				
+				con.close();  
+				//request.setAttribute("username", emailAddress);
+				//dispatcher = request.getRequestDispatcher("Main.jsp");
+				response.sendRedirect("Main");
+				return;
 			}
 			else {
-				 dispatcher = request.getRequestDispatcher("Sign Up.jsp");
+				con.close();  
+				//dispatcher = request.getRequestDispatcher("Sign Up.jsp");
 			}
   
-			con.close();  
-			dispatcher.forward(request, response);
+			
+			//dispatcher.forward(request, response);
 		}
 		catch(Exception e){ System.out.println(e);}  
+		doGet(request, response);
 		
 	}
 

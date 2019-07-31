@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Servlet implementation class LogIn
@@ -73,7 +74,7 @@ public class LogIn extends HttpServlet {
 			Class.forName("com.mysql.jdbc.Driver");  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-			PreparedStatement stmt=con.prepareStatement("Select FirstName from UserTable where EmailAddress = ? and Password = ?");  
+			PreparedStatement stmt=con.prepareStatement("Select FirstName,AccountType from UserTable where EmailAddress = ? and Password = ?");  
 		
 			stmt.setString(1, email);
 			stmt.setString(2, password);
@@ -91,23 +92,27 @@ public class LogIn extends HttpServlet {
 			
 			int count = 0;
 			String fname = "";
+			int type = 0;
 			RequestDispatcher dispatcher;
 			while(rs.next()) {
 				count++;
 				fname = rs.getString("FirstName");
+				type = Integer.parseInt(rs.getString("AccountType"));
                 
 			}
 			if(count == 1) {
+				User _user = new User(fname, email, type);
+				HttpSession session = request.getSession();
 				request.setAttribute("value", "Welcome " + fname);
-				request.setAttribute("username", email);
+				session.setAttribute("username", _user);
+				
 				dispatcher = request.getRequestDispatcher("Main.jsp");
 			}
 			else {
 				dispatcher = request.getRequestDispatcher("Login.jsp");
 			}
 			
-//			while(rs.next())  
-//			System.out.println(rs.getInt(1)+"  "+rs.getString(2)+"  "+rs.getString(3));  
+//			
 			con.close();  
 			dispatcher.forward(request, response);
 		}
