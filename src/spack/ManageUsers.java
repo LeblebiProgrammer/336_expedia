@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+
 import com.mysql.jdbc.ResultSetMetaData;
 
 /**
@@ -107,7 +108,7 @@ public class ManageUsers extends HttpServlet {
 		return rowCount;
 	}
 
-    protected void finishHtml(java.io.PrintWriter out) {
+    protected void finishHtml(java.io.PrintWriter out, String error) {
     	String str = "<div>\n" + 
     			"		<br> <br> <br> <br>\n" + 
     			"		<p>Add User</p>\n" + 
@@ -133,6 +134,7 @@ public class ManageUsers extends HttpServlet {
     			"		<input type=\"submit\" name = \"click\" value=\"Add User\" />\n" + 
     			"	</div>\n" + 
     			"	</form>\n" + 
+    			"<p>" + error+ "</p>"+
     			"</body>\n" + 
     			"</html>";
     	out.write(str);
@@ -144,6 +146,7 @@ public class ManageUsers extends HttpServlet {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		try {
+			String error = request.getParameter("error");
 			Class.forName("com.mysql.jdbc.Driver");  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
@@ -157,8 +160,11 @@ public class ManageUsers extends HttpServlet {
 			
 			initialHtml(response.getWriter());
 			makeTable(rs, response.getWriter());
-
-			finishHtml(response.getWriter());
+			
+			if(error == null) {
+				error = "";
+			}
+			finishHtml(response.getWriter(), error);
 			con.close();
 		}
 		catch(Exception e) {
@@ -173,17 +179,122 @@ public class ManageUsers extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
-		//menu options
+		//navigation
+		if(request.getParameter("click").equals("Manage users")) {
+		}
+		if(request.getParameter("click").equals("GetSales")) {
+			response.sendRedirect("GetSales");
+			return;
+		}
+		if(request.getParameter("click").equals("GetReservations")) {
+			response.sendRedirect("GetReservations");
+			return;
+		}
+		if(request.getParameter("click").equals("GetRevenue")) {
+			response.sendRedirect("GetRevenue");
+			return;
+		}
+		if(request.getParameter("click").equals("GetWaitlist")) {
+			response.sendRedirect("GetWaitlist");
+			return;
+		}
+		if(request.getParameter("click").equals("GetFlightHistory")) {
+			response.sendRedirect("GetFlightHistory");
+			return;
+		}
+		if(request.getParameter("click").equals("GetallFlights")) {
+			response.sendRedirect("GetAllFlights");
+			return;
+		}
 		
 		
 		
 		if(request.getParameter("click").equals("Add User")) {
+			String firstName = "";
+			String lastName = "";
+
+			String password = "";
+			String emailAddress = "";
+
+			String temptype = request.getParameter("accountType");
+			
+			int account = 0;
+			String error = "";
+			
+			firstName = request.getParameter("first_name");
+			lastName = request.getParameter("last_name");
+			
+			password = request.getParameter("password");
+			emailAddress = request.getParameter("email");
+			
+			
+			boolean isCorrect = true;
+			
+			if(firstName.length() == 0) {
+				isCorrect = false;
+				error = "Please enter a first name. ";
+			}
+			if(lastName.length() == 0) {
+				error += "Please enter a last name. ";
+				isCorrect = false;
+			}
+			if(temptype.length() == 0) {
+				error += "Please enter an account type. ";
+				isCorrect = false;
+			}
+			else {
+				try {
+					account = Integer.parseInt(temptype);
+					if(account > 3 || account <1) {
+						error += "Please enter account type in between 1 and 3. ";
+					}
+				}catch(Exception e) {
+					error += e.getMessage();
+				}
+			}
+			if(password.length() == 0) {
+				isCorrect = false;
+				request.setAttribute("error3", "Please enter password");
+			}
+			if(emailAddress.length() == 0) {
+				request.setAttribute("error4", "Please enter an email");
+				isCorrect = false;
+			}
+			
+			if(isCorrect == true) {
+				 
+			
+				
+				try {
+					Class.forName("com.mysql.jdbc.Driver");  
+					Connection con=DriverManager.getConnection(  
+					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
+					PreparedStatement stmt=con.prepareStatement("Insert into UserTable (FirstName, LastName, Password, AccountType, EmailAddress) Values (?, ?, ?, ?, ?)");  
+	
+					stmt.setString(1, firstName);
+					stmt.setString(2, lastName);
+					stmt.setString(3, password);
+					stmt.setString(4, "3");
+					stmt.setString(5, emailAddress);
+					
+					stmt.executeUpdate();
+					con.close();
+					
+				}catch(Exception e) {
+					error += e.getMessage();
+					
+				}
+			}
+			if(error.length()> 0) {
+				request.setAttribute("error", error);
+			}
+			
 			
 		}
 		else if(request.getParameter("click") != null) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("EditUser");
 			String str = request.getParameter("click");
-			request.setAttribute("_ID", str);
+			request.setAttribute("userID", str);
 			dispatcher.forward( request, response);
 		}
 		//person details

@@ -1,6 +1,5 @@
 package spack;
 
-import java.util.ArrayList;
 
 public class SearchObject {
 

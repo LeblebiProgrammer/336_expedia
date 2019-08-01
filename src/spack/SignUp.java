@@ -98,7 +98,6 @@ public class SignUp extends HttpServlet {
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 			PreparedStatement stmt=con.prepareStatement("Insert into UserTable (FirstName, LastName, Password, AccountType, EmailAddress) Values (?, ?, ?, ?, ?)");  
 		
-			RequestDispatcher dispatcher;
 			stmt.setString(1, firstName);
 			stmt.setString(2, lastName);
 			stmt.setString(3, password);

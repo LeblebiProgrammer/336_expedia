@@ -13,26 +13,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Servlet implementation class EditUser
+ * Servlet implementation class EditAirline
  */
-@WebServlet("/EditUser")
-public class EditUser extends HttpServlet {
+@WebServlet("/EditAirline")
+public class EditAirline extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
 	
-	private int ID;
+	private int id = 0;
 	
 	private void setID(int value) {
-		ID = value;
+		id = value;
 	}
 	
-	private int getID(){
-		return ID;
+	private int getID() {
+		return id;
 	}
-	
 	
 	 protected void initializeHtml(java.io.PrintWriter out , ResultSet rs) throws Exception {
 	    	if(rs.next()) {
@@ -41,26 +40,18 @@ public class EditUser extends HttpServlet {
 	    			"<html>\n" + 
 		    			"<head>"+
 		    			"<meta charset=\"UTF-8\">\n" + 
-		    			"<title>Edit Delete Users</title>\n" +
+		    			"<title>Edit Delete Airline</title>\n" +
 		    			"</head><body>" + 
-			    			"<div>\n<form action=\"EditUser\" method=\"post\">" + 
+			    			"<div>\n<form action=\"EditAirline\" method=\"post\">" + 
 			    			"		<br> <br> <br> <br>\n" + 
 			    			"		<p>Add airplane</p>\n" + 
 			    			"		<table border=\"2\">\n" + 
 			    			"			<tbody>\n" + 
 			    			"				<tr>\n" + 
-			    			"					<td>First Name</td>\n" + 
-			    			"					<td>LastName</td>\n" + 
-			    			"					<td>AccountType</td>\n" + 
-			    			"					<td>Email</td>\n" + 
-			    			"					<td>Password</td>\n" + 
+			    			"					<td>Airline Name</td>\n" +
 			    			"				</tr>\n" + 
 			    			"				<tr>\n" + 
-			    			"					<td><input name=\"FirstName\" value = \""+rs.getString("FirstName")+"\"    /></td>\n" + 
-			    			"					<td><input name=\"LastName\" value = \""+ rs.getString("LastName")+"\" /></td>\n" + 
-			    			"					<td><input name=\"AccountType\" type = \"number\" min=\"0\" value = \""+ rs.getInt("AccountType") + "\"/></td>\n" + 
-			    			"					<td><input name=\"Email\"   value = \""+ rs.getString("EmailAddress") +"\" /></td>\n" + 
-			    			"					<td><input name=\"Password\"   value = \""+ rs.getString("Password") +"\"/></td>\n" + 
+			    			"					<td><input name=\"Name\" value = \""+rs.getString("Name")+"\"    /></td>\n" + 
 			    			"				</tr>\n" + 
 			    			"			</tbody>\n" + 
 			    			"		</table>\n" + 
@@ -68,6 +59,7 @@ public class EditUser extends HttpServlet {
 			    			"		<input type=\"submit\" name = \"click\" value=\"Update\" />\n" +
 			    			"<input type=\"submit\" name = \"click\" value=\"Delete\" />\n" +
 			    			"	</form></div>\n" + 
+			    			"<p>${error}</p>"+
 		    			"</body>\n" + 
 	    			"</html>";
 	    	out.write(str);
@@ -75,8 +67,7 @@ public class EditUser extends HttpServlet {
 	    }
 	    
 	
-	
-    public EditUser() {
+    public EditAirline() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -86,9 +77,9 @@ public class EditUser extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		// response.getWriter().append("Served at: ").append(request.getContextPath());
 		int id = 0;
-		String strid = (String) request.getAttribute("userID");
+		String strid =   (String)request.getAttribute("_id");
 		if(strid != null) {
 			id = Integer.parseInt(strid);
 		}
@@ -103,7 +94,7 @@ public class EditUser extends HttpServlet {
 						"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");
 					
 				PreparedStatement stmt;		
-				stmt=con.prepareStatement("Select FirstName, LastName, AccountType, EmailAddress, Password from UserTable where ID = ?");
+				stmt=con.prepareStatement("Select Name from AirlineTable where AirlineID = ?");
 				stmt.setInt(1, id);
 				
 				ResultSet rs = stmt.executeQuery();
@@ -123,50 +114,19 @@ public class EditUser extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		if(request.getParameter("click").equals("Update")) {
-			String firstName = "";
-			String lastName = "";
-
-			String password = "";
-			String emailAddress = "";
-			int accountType = 0;
-
+			String name = "";
+			
 			String error = "";
 			
-			firstName = request.getParameter("FirstName");
-			lastName = request.getParameter("LastName");
-			
-			password = request.getParameter("Password");
-			emailAddress = request.getParameter("Email");
-			accountType = Integer.parseInt(request.getParameter("AccountType"));
+			name = request.getParameter("Name");
 			
 			boolean isCorrect = true;
 			
-			if(firstName.length() == 0) {
+			if(name.length() == 0) {
 				isCorrect = false;
-				error = "First name cannot be empty. ";
+				error = "Airline name cannot be empty. ";
 			}
-			if(lastName.length() == 0) {
-				error += "Last name cannot be empty. ";
-				isCorrect = false;
-			}
-			if(password.length() == 0) {
-				isCorrect = false;
-				error += "Password cannot be empty. ";
-			}
-			if(emailAddress.length() == 0) {
-				error += "Email cannot be empty. ";
-				isCorrect = false;
-			}
-			if(accountType != 0) {
-				if(accountType > 3 || accountType<1) {
-					error += "Account type must be between 1 and 3.";
-					isCorrect = false;
-				}
-			}
-			else {
-				isCorrect = false;
-				error += "Account type must be between 1 and 3.";
-			}
+			
 			if(isCorrect == false) {
 				 request.setAttribute("error", error);
 			}
@@ -176,15 +136,11 @@ public class EditUser extends HttpServlet {
 							"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");
 						
 					PreparedStatement stmt;		
-					stmt= con.prepareStatement("Update UserTable set FirstName = ?,"
-							+ " LastName = ?, AccountType = ?, Password = ?, EmailAddress = ? where ID = ?");  
+					stmt= con.prepareStatement("Update AirlineTable set Name = ? where AirlineID = ?");  
 					
-					stmt.setString(1, firstName);
-					stmt.setString(2, lastName);
-					stmt.setInt(3, accountType);
-					stmt.setString(4, password);
-					stmt.setString(5, emailAddress);
-					stmt.setInt(6, this.getID());
+					stmt.setString(1, name);
+					
+					stmt.setInt(2, this.getID());
 					int count = stmt.executeUpdate();
 					if(count>0) {
 						System.out.println("Updated");
@@ -192,10 +148,10 @@ public class EditUser extends HttpServlet {
 
 					
 					con.close();
-					response.sendRedirect("ManageUsers");
+					response.sendRedirect("ManageAirlines");
 					return;
 					}catch(Exception e) {
-						
+						System.out.println(e.getMessage());
 					}
 			}
 		}
@@ -204,7 +160,7 @@ public class EditUser extends HttpServlet {
 				Connection con = DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");
 			
-				PreparedStatement stmt=con.prepareStatement("Delete from UserTable where ID = ?");
+				PreparedStatement stmt=con.prepareStatement("Delete from AirlineTable where AirlineID = ?");
 				stmt.setInt(1,this.getID());
 				
 				int count = stmt.executeUpdate();
@@ -214,7 +170,7 @@ public class EditUser extends HttpServlet {
 				con.close();
 				
 				
-				response.sendRedirect("ManageUsers");
+				response.sendRedirect("ManageAirlines");
 				return;
 				
 			}catch(Exception e) {

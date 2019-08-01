@@ -37,7 +37,7 @@ public class Main extends HttpServlet {
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		String fromDate = "";
-		String str = "";
+//		String str = "";
 		HttpSession session = request.getSession();
 		if(request.getParameter("_fromDate") == null) {
 			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
@@ -52,10 +52,10 @@ public class Main extends HttpServlet {
 			request.setAttribute("_returnDate", "");
 		}
 		if(request.getParameter("error") == null) {
-			str = "";
+			//str = "";
 		}
 		else {
-			str = request.getParameter("error");
+			//str = request.getParameter("error");
 		}
 		if(session.getAttribute("username") != null) {
 			User _user = (User) session.getAttribute("username");

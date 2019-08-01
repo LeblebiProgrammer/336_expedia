@@ -35,6 +35,10 @@
 				</tr>
 				<tr style="height: 27px;">
 					<td style="width: 260px; height: 27px; text-align: center;"><input
+						name="click" type="submit" value="ManageAirports" /></td>
+				</tr>
+				<tr style="height: 27px;">
+					<td style="width: 260px; height: 27px; text-align: center;"><input
 						name="click" type="submit" value="ManageAirlines" /></td>
 				</tr>
 				<tr style="height: 27px;">

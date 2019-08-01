@@ -23,7 +23,6 @@ import com.mysql.jdbc.ResultSetMetaData;
 public class ManageAirplanes extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	
-    private ArrayList<Airplane>planeList;   
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -82,30 +81,34 @@ public class ManageAirplanes extends HttpServlet {
     			"	<div>\n" + 
     			"		<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
     			"			<tbody>\n" + 
-    			"				<tr style=\"height: 27px;\">\n" + 
+    			"<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Book for User\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"BookUser\" /></td>\n" + 
     			"				</tr>\n" + 
     			"				<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Change Flight for User\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"ChangeFlight\" /></td>\n" + 
     			"				</tr>\n" + 
     			"				<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Manage Flights\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"ManageFlights\" /></td>\n" + 
     			"				</tr>\n" + 
     			"				<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Manage Airlines\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"ManageAirports\" /></td>\n" + 
     			"				</tr>\n" + 
     			"				<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Manage Airplanes\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"ManageAirlines\" /></td>\n" + 
     			"				</tr>\n" + 
     			"				<tr style=\"height: 27px;\">\n" + 
     			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    			"						name=\"click\" type=\"submit\" value=\"Get Waitlist\" /></td>\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"ManageAirplanes\" /></td>\n" + 
     			"				</tr>\n" + 
+    			"				<tr style=\"height: 27px;\">\n" + 
+    			"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+    			"						name=\"click\" type=\"submit\" value=\"GetWaitlist\" /></td>\n" + 
+    			"				</tr>"+
     			"			</tbody>\n" + 
     			"		</table>  	</div>";
     	out.print(str);

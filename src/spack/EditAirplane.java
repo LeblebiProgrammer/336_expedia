@@ -125,7 +125,7 @@ public class EditAirplane extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		String forwardAddress = "";
+		//String forwardAddress = "";
 		if(request.getParameter("click").equals("Update")) {
 			String _tailNumber = "";
 			String manufacturer = "";
