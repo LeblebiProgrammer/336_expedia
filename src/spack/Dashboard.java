@@ -114,6 +114,7 @@ public class Dashboard extends HttpServlet {
 		}
 		if(request.getParameter("click").equals("GetWaitlist")) {
 			response.sendRedirect("GetWaitlist");
+			return;
 		}
 
 		
