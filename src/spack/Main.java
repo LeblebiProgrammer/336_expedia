@@ -98,7 +98,7 @@ public class Main extends HttpServlet {
 		//login
 		else if(request.getParameter("click").equals("login")) {
 			
-			RequestDispatcher dispatcher = request.getRequestDispatcher("LogIn.jsp");
+			RequestDispatcher dispatcher = request.getRequestDispatcher("LogIn");
 			dispatcher.forward( request, response);
 			return;
 		}
