@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -55,7 +56,8 @@ public class ManageAirplanes extends HttpServlet {
 					out.println("<TD>");
 					out.println("<input name=\"click\" type=\"submit\" value=\""+ rs.getString(i+1)  +"\" /> ");
 					
-				}else {
+				}
+				else {
 					out.println("<TD>" + rs.getString(i + 1) + "</TD>");
 				}
 			}
@@ -115,7 +117,7 @@ public class ManageAirplanes extends HttpServlet {
 
 
     
-    protected void finishHtml(java.io.PrintWriter out) {
+    protected void finishHtml(java.io.PrintWriter out, ResultSet airline) throws SQLException {
     	String str = "<div>\n" + 
     			"		<br> <br> <br> <br>\n" + 
     			"		<p>Add airplane</p>\n" + 
@@ -128,6 +130,7 @@ public class ManageAirplanes extends HttpServlet {
     			"					<td>Economy Count</td>\n" + 
     			"					<td>Business Count</td>\n" + 
     			"					<td>First Count</td>\n" + 
+    			"					<td>Airline</td>\n" + 
     			"				</tr>\n" + 
     			"				<tr>\n" + 
     			"					<td><input name=\"tailNumber\" /></td>\n" + 
@@ -135,8 +138,23 @@ public class ManageAirplanes extends HttpServlet {
     			"					<td><input name=\"model\" /></td>\n" + 
     			"					<td><input name=\"economyCount\" type = \"number\" min=\"0\" value = \"0\"/></td>\n" + 
     			"					<td><input name=\"businessCount\" type = \"number\" min=\"0\"  value = \"0\" /></td>\n" + 
-    			"					<td><input name=\"firstCount\" type = \"number\" min=\"0\"  value = \"0\"/></td>\n" + 
-    			"				</tr>\n" + 
+    			"					<td><input name=\"firstCount\" type = \"number\" min=\"0\"  value = \"0\"/></td>\n";   
+    			
+    	//airline
+    	str +=	"					</select></td><td width = \"14%\"><select name = \"AirlineName\" size =\"1\">\n\t" ;
+    	do {
+    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+    		try {
+    			String option = "<option value = \"" + airline.getString("Code") + "\">" + airline.getString("Name") + "</option>\n";
+    			str += option;
+    		}
+    		catch(Exception e) {
+    			
+    		}
+    	}while(airline.next());
+    	str += "</select></td>";
+
+    	str +=	"				</tr>\n" + 
     			"			</tbody>\n" + 
     			"		</table>\n" + 
     			"		\n" + 
@@ -148,6 +166,8 @@ public class ManageAirplanes extends HttpServlet {
     	out.write(str);
     }
     
+    
+    
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		try {
@@ -156,18 +176,21 @@ public class ManageAirplanes extends HttpServlet {
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 			
 			PreparedStatement stmt;	
-			if(request.getParameter("SearchParam") == null) {
-				stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount from AircraftTable");  
-			}
-			else {
-				stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount from AircraftTable");
-			}
+			PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
+			
+			stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount, Airline from AircraftTable");  
+			
+			
 			ResultSet rs = stmt.executeQuery();
+			ResultSet rs2 = stmt3.executeQuery();
+			
+			
+			
 			
 			initialHtml(response.getWriter());
 			makeTable(rs, response.getWriter());
 			//searchTable(response.getWriter());
-			finishHtml(response.getWriter());
+			finishHtml(response.getWriter(), rs2);
 			con.close();
 		}
 		catch(Exception e) {
@@ -191,7 +214,7 @@ public class ManageAirplanes extends HttpServlet {
 			String economy = "";
 			String business = "";
 			String first = "";
-			
+			String airline = request.getParameter("Airline");
 			String error = "";
 			
 			int x = 0;
@@ -255,7 +278,7 @@ public class ManageAirplanes extends HttpServlet {
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 					PreparedStatement stmt=con.prepareStatement("Insert into AircraftTable (Manufacturer,"
-							+ " Model, EconomyCount, BusinessCount, FirstCount, TailNumber) Values (?, ?, ?, ?, ?, ?)");  
+							+ " Model, EconomyCount, BusinessCount, FirstCount, TailNumber, Airline) Values (?, ?, ?, ?, ?, ?, ?)");  
 				
 					//RequestDispatcher dispatcher;
 					stmt.setString(1, manufacturer);
@@ -264,7 +287,7 @@ public class ManageAirplanes extends HttpServlet {
 					stmt.setInt(4, x2);
 					stmt.setInt(5, x3);
 					stmt.setString(6, tailNumber);
-					
+					stmt.setString(7, airline);
 					int count = stmt.executeUpdate();
 					if(count > 0) {
 						System.out.println("Inserted");

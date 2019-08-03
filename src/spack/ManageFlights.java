@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -88,6 +89,8 @@ public class ManageFlights extends HttpServlet {
     	
     	out.print(str);
     }
+	
+	
 	private int makeTable(java.sql.ResultSet rs, java.io.PrintWriter out)
 	    	    throws Exception {
 			 int rowCount = 0;
@@ -106,7 +109,7 @@ public class ManageFlights extends HttpServlet {
 				rowCount++;
 				out.println("<TR>");
 				for (int i = 0; i < columnCount; i++) {
-					if(rsmd.getColumnLabel(i+1).equals("AirportCode")) {
+					if(rsmd.getColumnLabel(i+1).equals("FlightNumber")) {
 						out.println("<TD>");
 						out.println("<input name=\"click\" type=\"submit\" value=\""+ rs.getString(i+1)  +"\" /> ");
 						
@@ -122,37 +125,89 @@ public class ManageFlights extends HttpServlet {
 		}
 	    
 	
-    protected void finishHtml(java.io.PrintWriter out, ResultSet aircraft, ResultSet airline, ResultSet airport, String error) throws SQLException {
+    protected void finishHtml(java.io.PrintWriter out, ResultSet aircraft, ResultSet airline, ResultSet airport, ResultSet airport2, String error) throws SQLException {
     	String str = "<div>\n" + 
     			"		<br> <br> <br> <br>\n" + 
     			"		<p>Add Flight</p>\n" + 
     			"		<table border=\"2\">\n" + 
     			"			<tbody>\n" + 
     			"				<tr>\n" + 
-    			"					<td>Flight Number</td>\n" + 
-    			"					<td width = \"15%\">Tail Number</td>\n" +
-    			"					<td>Airline Name</td>\n" + 
-    			"					<td>Departure</td>\n" + 
-    			"					<td>Destination</td>\n" +
-    			"					<td>Departure Time</td>\n" + 
-    			"					<td>Arrival Time</td>\n" + 
+    			"					<td width = \"14%\">Flight Number</td>\n" + 
+    			"					<td width = \"14%\">Tail Number</td>\n" +
+    			"					<td width = \"14%\">Airline Name</td>\n" + 
+    			"					<td width = \"14%\">Departure</td>\n" + 
+    			"					<td width = \"14%\">Destination</td>\n" +
+    			"					<td width = \"14%\">Departure Time</td>\n" + 
+    			"					<td width = \"14%\">Arrival Time</td>\n" + 
     			"				</tr>\n" + 
     			"				<tr>\n" + 
-    			"					<td><input type=\"text\" name=\"FlightNumber\" /></td>\n<td width = \"15%\"><select name = \"TailNumber\" size = \"1\""; 
-    	while(aircraft.next()) {
-    		String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";
-    		str += option;
-    	}
-//		ResultSetMetaData rsmd = (ResultSetMetaData) aircraft.getMetaData();
-//		int columnCount = rsmd.getColumnCount();
+    			"					<td><input type=\"text\" name=\"FlightNumber\" /></td>\n<td width = \"14%\"><select name = \"TailNumber\" size =\"1\">\n\t"; 
     	
-    	str +=
-//    			"					<td><input type=\"text\" name=\"TailNumber\" /></td>\n" + 
-    			"					<td><input type=\"text\" name=\"AirlineName\" /></td></td>\n" + 
-    			"					<td><input type=\"text\" name=\"Departure\" /></td>\n" +
-    			"					<td><input type=\"text\" name=\"Arrival\" /></td>\n" + 
-    			"					<td><input type=\"text\" name=\"DepartureTime\" /></td></td>\n" + 
-    			"					<td><input type=\"text\" name=\"ArrivalTime\" /></td>\n" +
+    	//aircraft
+    	do {
+    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+    		try {
+    			String option = "<option value = \"" + aircraft.getString("TailNumber") + "\">" + aircraft.getString("TailNumber") + "</option>\n";
+    			str += option;
+    		}
+    		catch(Exception e) {
+    			
+    		}
+    	}while(aircraft.next());
+    	
+
+    	//airline
+    	str +=	"					</select></td><td width = \"14%\"><select name = \"AirlineName\" size =\"1\">\n\t" ;
+    	do {
+    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+    		try {
+    			String option = "<option value = \"" + airline.getString("Code") + "\">" + airline.getString("Name") + "</option>\n";
+    			str += option;
+    		}
+    		catch(Exception e) {
+    			
+    		}
+    	}while(airline.next());
+    	str += "</select></td>";
+
+    	str += "					<td width = \"14%\"><select name = \"Departure\" size = \"1\">";
+    	
+    	
+    	
+    	//departure
+    	do {
+    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+    		try {
+    			String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
+    			str += option;
+    		}
+    		catch(Exception e) {
+    			System.out.print(e.getMessage());
+    		}
+    	}while(airport.next());
+    	str += "</select></td>";
+    	
+    	
+    	
+    	//arrival
+    	str += "<td width = \"14%\"><select name = \"Arrival\" size = \"1\">";
+    	
+		do {
+    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+    		try {
+    			String option = "<option value = \"" + airport2.getString("AirportCode") + "\">" + airport2.getString("AirportName") + "</option>\n";
+    			str += option;
+    		}
+    		catch(Exception e) {
+    			System.out.print(e.getMessage());
+    		}
+    	}while(airport2.next());
+    	str += "</select></td>";
+    	
+    	
+    		
+    	str += "					<td width = \"14%\"><input type=\"text\" name=\"DepartureTime\" /></td></td>\n" + 
+    			"					<td width = \"14%\"><input type=\"text\" name=\"ArrivalTime\" /></td>\n" +
     			"				</tr>\n" + 
     			"			</tbody>\n" + 
     			"		</table>\n" + 
@@ -186,18 +241,18 @@ public class ManageFlights extends HttpServlet {
 			
 			PreparedStatement stmt;	
 			
-			stmt=con.prepareStatement("Select * from AirportTable");  
+			stmt=con.prepareStatement("Select * from FlightInfoTable");  
 			
 			PreparedStatement stmt2 = con.prepareStatement("Select * from AircraftTable");
 			PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
 			PreparedStatement stmt4 = con.prepareStatement("Select * from AirportTable");
-			
+			PreparedStatement stmt5 = con.prepareStatement("Select * from AirportTable");
 			
 			ResultSet rs = stmt.executeQuery();
 			ResultSet rs2 = stmt2.executeQuery();
 			ResultSet rs3 = stmt3.executeQuery();
 			ResultSet rs4 = stmt4.executeQuery();
-			
+			ResultSet rs5 = stmt5.executeQuery();
 			
 			
 			initialHtml(response.getWriter());
@@ -211,7 +266,7 @@ public class ManageFlights extends HttpServlet {
 			else {
 				_error = "";
 			}
-			finishHtml(response.getWriter(), rs2, rs3, rs4, _error);
+			finishHtml(response.getWriter(), rs2, rs3, rs4, rs5, _error);
 			con.close();
 		}
 		catch(Exception e) {
@@ -246,6 +301,7 @@ public class ManageFlights extends HttpServlet {
 				if(flightNumber.length() == 0 ) {
 					_error = "Flight number cannot be empty. ";
 				}
+				
 			}
 			if(tailNumber == null) {
 				_error += "Tail number cannot be empty. ";
@@ -260,13 +316,19 @@ public class ManageFlights extends HttpServlet {
 				if(airlineName.length() == 0) {
 					_error += "Airline name cannot be empty. ";
 				}
+				else {
+					if(flightNumber.length() > 0) {
+						flightNumber = airlineName + flightNumber;
+					}
+				}
 			}
 			if(departure == null) {
 				_error += "Departure name cannot be empty. ";
 			}else {
-				if(departure.length() != 0) {
+				if(departure.length() != 3) {
 					_error += "Departure name must have 3 characters. ";
 				}
+				
 			}
 			if(arrival == null) {
 				_error += "Arrival name cannot be empty. ";
@@ -330,6 +392,13 @@ public class ManageFlights extends HttpServlet {
 					stmt.setTime(6, departureTime);
 					stmt.setTime(7, arrivalTime);
 					
+					stmt.executeUpdate();
+					con.close();
+					
+					request.setAttribute("flightNumber", flightNumber);
+//					RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
+//					dispatcher.forward(request, response);
+//					return;
 					
 				}catch(Exception e) {
 					_error += e.getMessage();
@@ -369,6 +438,9 @@ public class ManageFlights extends HttpServlet {
 		if(request.getParameter("click").equals("GetWaitlist")) {
 			response.sendRedirect("GetWaitlist");
 			return;
+		}
+		if(request.getParameter("click") != null) {
+			
 		}
 		
 		

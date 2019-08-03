@@ -47,8 +47,9 @@ public class EditAirplane extends HttpServlet {
     
     
     
-    protected void initializeHtml(java.io.PrintWriter out , ResultSet rs) throws Exception {
+    protected void initializeHtml(java.io.PrintWriter out , ResultSet rs, ResultSet airline) throws Exception {
     	if(rs.next()) {
+    	String aname = rs.getString("Airline");
     	String str = 
     			"<!DOCTYPE html>\n" + 
     			"<html>\n" + 
@@ -67,7 +68,8 @@ public class EditAirplane extends HttpServlet {
 		    			"					<td>Model</td>\n" + 
 		    			"					<td>Economy Count</td>\n" + 
 		    			"					<td>Business Count</td>\n" + 
-		    			"					<td>First Count</td>\n" + 
+		    			"					<td>First Count</td>\n" +
+		    			"					<td>Airline</td>\n" + 
 		    			"				</tr>\n" + 
 		    			"				<tr>\n" + 
 		    			"					<td><input name=\"tailNumber\" value = \""+ rs.getString("TailNumber") +"\"/></td>\n" + 
@@ -75,8 +77,28 @@ public class EditAirplane extends HttpServlet {
 		    			"					<td><input name=\"model\" value = \""+ rs.getString("Model")+"\" /></td>\n" + 
 		    			"					<td><input name=\"economyCount\" type = \"number\" min=\"0\" value = \""+ rs.getInt("EconomyCount") + "\"/></td>\n" + 
 		    			"					<td><input name=\"businessCount\" type = \"number\" min=\"0\"  value = \""+ rs.getInt("BusinessCount") +"\" /></td>\n" + 
-		    			"					<td><input name=\"firstCount\" type = \"number\" min=\"0\"  value = \""+ rs.getInt("FirstCount") +"\"/></td>\n" + 
-		    			"				</tr>\n" + 
+		    			"					<td><input name=\"firstCount\" type = \"number\" min=\"0\"  value = \""+ rs.getInt("FirstCount") +"\"/></td>\n<td><select name = \"Airline\">";
+//		    			"  <td><input name=\"Airline\" value = \""+ rs.getString("Airline") +"\"/></td>\n" + 
+    	do {
+    		
+    		try {
+    			if(airline.getString("Code").equals(aname)) {
+    				String option = "<option value = \"" + airline.getString("Code") + "\" selected>" + airline.getString("Name") + "</option>\n";
+    				str += option;
+    			}
+    			else {
+	    			String option = "<option value = \"" + airline.getString("Code") + "\">" + airline.getString("Name") + "</option>\n";
+	    			str += option;
+    			}
+    		}
+    		catch(Exception e) {
+    			System.out.println(e.getMessage());
+    		}
+    	}while(airline.next());
+    	str += "</select></td>";
+    	
+    	
+    	str += "				</tr>\n" + 
 		    			"			</tbody>\n" + 
 		    			"		</table>\n" + 
 		    			"		\n" + 
@@ -106,11 +128,16 @@ public class EditAirplane extends HttpServlet {
 						"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");
 					
 				PreparedStatement stmt;		
-				stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount from AircraftTable where TailNumber = ?");
+				stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount, Airline from AircraftTable where TailNumber = ?");
 				stmt.setString(1, tailNumber);
 				
+
+				PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
+				
+				
 				ResultSet rs = stmt.executeQuery();
-				initializeHtml(response.getWriter(), rs);
+				ResultSet rs2 = stmt3.executeQuery();
+				initializeHtml(response.getWriter(), rs, rs2);
 				con.close();
 			}
 			catch (Exception e) {
@@ -133,7 +160,7 @@ public class EditAirplane extends HttpServlet {
 			String economy = "";
 			String business = "";
 			String first = "";
-			
+			String airline = request.getParameter("Airline");
 			String error = "";
 			
 			int x = 0;
@@ -194,7 +221,7 @@ public class EditAirplane extends HttpServlet {
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 					PreparedStatement stmt=con.prepareStatement("Update AircraftTable set Manufacturer = ?,"
-							+ " Model = ?, EconomyCount = ?, BusinessCount = ?, FirstCount = ?, TailNumber = ? where TailNumber = ? ");  
+							+ " Model = ?, EconomyCount = ?, BusinessCount = ?, FirstCount = ?, TailNumber = ?, Airline = ? where TailNumber = ? ");  
 				
 	
 					stmt.setString(1, manufacturer);
@@ -206,8 +233,9 @@ public class EditAirplane extends HttpServlet {
 	
 					stmt.setInt(5, x3);
 					stmt.setString(6, _tailNumber);
+					stmt.setString(7, airline);
 					
-					stmt.setString(7, this.getTail());
+					stmt.setString(8, this.getTail());
 					
 					int count = stmt.executeUpdate();
 					if(count > 0) {
