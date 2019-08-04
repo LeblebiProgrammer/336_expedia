@@ -121,8 +121,8 @@ public class LogIn extends HttpServlet {
 					User _user = new User(fname, email, type);
 					HttpSession session = request.getSession();
 					session.setAttribute("username", _user);
-					response.getWriter().print("aaaa test");
-					// response.sendRedirect("Main");
+					//response.getWriter().print("aaaa test");
+					response.sendRedirect("Main");
 					return;
 
 				} else {

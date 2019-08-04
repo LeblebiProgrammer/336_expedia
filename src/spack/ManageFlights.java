@@ -125,7 +125,7 @@ public class ManageFlights extends HttpServlet {
 		}
 	    
 	
-    protected void finishHtml(java.io.PrintWriter out, ResultSet aircraft, ResultSet airline, ResultSet airport, ResultSet airport2, String error) throws SQLException {
+    protected void finishHtml(java.io.PrintWriter out,  ResultSet airline, ResultSet airport, ResultSet airport2, String error) throws SQLException {
     	String str = "<div>\n" + 
     			"		<br> <br> <br> <br>\n" + 
     			"		<p>Add Flight</p>\n" + 
@@ -133,7 +133,6 @@ public class ManageFlights extends HttpServlet {
     			"			<tbody>\n" + 
     			"				<tr>\n" + 
     			"					<td width = \"14%\">Flight Number</td>\n" + 
-    			"					<td width = \"14%\">Tail Number</td>\n" +
     			"					<td width = \"14%\">Airline Name</td>\n" + 
     			"					<td width = \"14%\">Departure</td>\n" + 
     			"					<td width = \"14%\">Destination</td>\n" +
@@ -141,19 +140,19 @@ public class ManageFlights extends HttpServlet {
     			"					<td width = \"14%\">Arrival Time</td>\n" + 
     			"				</tr>\n" + 
     			"				<tr>\n" + 
-    			"					<td><input type=\"text\" name=\"FlightNumber\" /></td>\n<td width = \"14%\"><select name = \"TailNumber\" size =\"1\">\n\t"; 
+    			"					<td><input type=\"text\" name=\"FlightNumber\" /></td>\n"; 
     	
     	//aircraft
-    	do {
-    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
-    		try {
-    			String option = "<option value = \"" + aircraft.getString("TailNumber") + "\">" + aircraft.getString("TailNumber") + "</option>\n";
-    			str += option;
-    		}
-    		catch(Exception e) {
-    			
-    		}
-    	}while(aircraft.next());
+//    	do {
+//    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+//    		try {
+//    			String option = "<option value = \"" + aircraft.getString("TailNumber") + "\">" + aircraft.getString("TailNumber") + "</option>\n";
+//    			str += option;
+//    		}
+//    		catch(Exception e) {
+//    			
+//    		}
+//    	}while(aircraft.next());
     	
 
     	//airline
@@ -161,7 +160,7 @@ public class ManageFlights extends HttpServlet {
     	do {
     		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
     		try {
-    			String option = "<option value = \"" + airline.getString("Code") + "\">" + airline.getString("Name") + "</option>\n";
+    			String option = "<option value = \"" + airline.getString("Code") +";" +airline.getString("Name") + "\">" + airline.getString("Name") + "</option>\n";
     			str += option;
     		}
     		catch(Exception e) {
@@ -243,13 +242,13 @@ public class ManageFlights extends HttpServlet {
 			
 			stmt=con.prepareStatement("Select * from FlightInfoTable");  
 			
-			PreparedStatement stmt2 = con.prepareStatement("Select * from AircraftTable");
+			//PreparedStatement stmt2 = con.prepareStatement("Select * from AircraftTable");
 			PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
 			PreparedStatement stmt4 = con.prepareStatement("Select * from AirportTable");
 			PreparedStatement stmt5 = con.prepareStatement("Select * from AirportTable");
 			
 			ResultSet rs = stmt.executeQuery();
-			ResultSet rs2 = stmt2.executeQuery();
+			//ResultSet rs2 = stmt2.executeQuery();
 			ResultSet rs3 = stmt3.executeQuery();
 			ResultSet rs4 = stmt4.executeQuery();
 			ResultSet rs5 = stmt5.executeQuery();
@@ -266,7 +265,7 @@ public class ManageFlights extends HttpServlet {
 			else {
 				_error = "";
 			}
-			finishHtml(response.getWriter(), rs2, rs3, rs4, rs5, _error);
+			finishHtml(response.getWriter(), rs3, rs4, rs5, _error);
 			con.close();
 		}
 		catch(Exception e) {
@@ -282,8 +281,10 @@ public class ManageFlights extends HttpServlet {
 		
 		if(request.getParameter("click").equals("Add Flight")) {
 			String flightNumber = request.getParameter("FlightNumber");
-			String tailNumber = request.getParameter("TailNumber");
-			String airlineName = request.getParameter("AirlineName");
+			
+			String airlineCombo = request.getParameter("AirlineName");
+			String airlineName = airlineCombo.substring(airlineCombo.indexOf(';')+1);
+			String code = airlineCombo.substring(0, airlineCombo.indexOf(';'));
 			String departure = request.getParameter("Departure");
 			String arrival = request.getParameter("Arrival");
 			Time departureTime = new Time(0);
@@ -303,13 +304,7 @@ public class ManageFlights extends HttpServlet {
 				}
 				
 			}
-			if(tailNumber == null) {
-				_error += "Tail number cannot be empty. ";
-			}else {
-				if(tailNumber.length() == 0) {
-					_error += "Tail number cannot be empty. ";
-				}
-			}
+			
 			if(airlineName == null) {
 				_error += "Airline name cannot be empty. ";
 			}else {
@@ -318,7 +313,7 @@ public class ManageFlights extends HttpServlet {
 				}
 				else {
 					if(flightNumber.length() > 0) {
-						flightNumber = airlineName + flightNumber;
+						flightNumber = code + flightNumber;
 					}
 				}
 			}
@@ -344,6 +339,9 @@ public class ManageFlights extends HttpServlet {
 					_error += "Departure time cannot be empty. ";
 				}else {
 					try {
+						if(_tdemp.length() == 4) {
+							_tdemp = "0"+_tdemp;
+						}
 				        LocalTime.parse(_tdemp);
 				        //System.out.println("Valid time string: " + _tdemp);
 				        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
@@ -382,15 +380,15 @@ public class ManageFlights extends HttpServlet {
 					Class.forName("com.mysql.jdbc.Driver");  
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-					PreparedStatement stmt=con.prepareStatement("Insert into FlightInfoTable (FlightNumber, TailNumber, AirlineName, DepartureCity, DesinationCity, DepartureTime, ArrivalTime) Values (?, ?, ?, ?, ?, ?, ?)");  
+					PreparedStatement stmt=con.prepareStatement("Insert into FlightInfoTable (FlightNumber, AirlineName, DepartureCity, DestinationCity, DepartureTime, ArrivalTime) Values (?, ?, ?, ?, ?, ?)");  
 					
 					stmt.setString(1, flightNumber);
-					stmt.setString(2, tailNumber);
-					stmt.setString(3, airlineName);
-					stmt.setString(4, departure);
-					stmt.setString(5, arrival);
-					stmt.setTime(6, departureTime);
-					stmt.setTime(7, arrivalTime);
+					
+					stmt.setString(2, airlineName);
+					stmt.setString(3, departure);
+					stmt.setString(4, arrival);
+					stmt.setTime(5, departureTime);
+					stmt.setTime(6, arrivalTime);
 					
 					stmt.executeUpdate();
 					con.close();
@@ -402,6 +400,7 @@ public class ManageFlights extends HttpServlet {
 					
 				}catch(Exception e) {
 					_error += e.getMessage();
+					System.out.println(e.getMessage());
 				}
 			}
 			
@@ -440,6 +439,13 @@ public class ManageFlights extends HttpServlet {
 			return;
 		}
 		if(request.getParameter("click") != null) {
+			String str = request.getParameter("click");
+			
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
+			request.setAttribute("_flight", str);
+			dispatcher.forward(request, response);
+			return;
 			
 		}
 		

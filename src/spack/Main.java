@@ -37,12 +37,47 @@ public class Main extends HttpServlet {
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
 		
 		String fromDate = "";
+		String returnDate = "";
+		
+		String origin = "JFK"; // for now i want to put hard coded searches on Main JSP
+		String destination = "LAX";
+		
+		request.setAttribute("_origin", origin);
+		request.setAttribute("_destination", destination);
+		
 //		String str = "";
 		HttpSession session = request.getSession();
 		if(request.getParameter("_fromDate") == null) {
+			
+			Date dateOfSearch = new Date();
+			
+			int noOfDays = 7; 
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(dateOfSearch);            
+			calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+			Date date = calendar.getTime();
+			
 			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-			Date date = new Date();
+			
 			fromDate = dateFormat.format(date);
+		}
+		else {
+			//fromDate = request.getParameter("_fromDate");	
+		}
+		
+		
+		
+		if(request.getParameter("_returnDate") == null) {
+			Date dateOfSearch = new Date();
+			
+			int noOfDays = 14; 
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(dateOfSearch);            
+			calendar.add(Calendar.DAY_OF_YEAR, noOfDays);
+			Date date = calendar.getTime();
+			
+			DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+			returnDate = dateFormat.format(date);
 		}
 		else {
 			//fromDate = request.getParameter("_fromDate");	
@@ -64,6 +99,10 @@ public class Main extends HttpServlet {
 
 		
 		request.setAttribute("_fromDate", fromDate);
+		request.setAttribute("_returnDate", returnDate);
+		
+		
+		
 		RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
 		dispatcher.forward( request, response);
 		return;
@@ -226,11 +265,17 @@ public class Main extends HttpServlet {
 				dispatcher.forward(request, response);
 			}
 			else {
-				SearchObject _so = new SearchObject(origin, destination, fromDate, returnDate, oneWayBox, roundTripBox);
-				session.setAttribute("search", _so);
+				//SearchObject _so = new SearchObject(origin, destination, fromDate, returnDate, oneWayBox, roundTripBox);
+				//session.setAttribute("search", _so);
 				
-				RequestDispatcher dispatcher = request.getRequestDispatcher("SearchResult");
+				
+				RequestDispatcher dispatcher = request.getRequestDispatcher("FlightSearch");
 				dispatcher.forward(request, response);
+				
+				
+//				RequestDispatcher dispatcher = request.getRequestDispatcher("SearchResult");
+//				dispatcher.forward(request, response);
+				return;
 			}
 		}
 		else if(request.getParameter("click").equals("Dashboard")) {
