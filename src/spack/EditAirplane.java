@@ -29,14 +29,14 @@ public class EditAirplane extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
     
-    private String tailNumber;
+    private int ID;
     
-    private String getTail() {
-    	return tailNumber;
+    private int getID() {
+    	return ID;
     }
     
-    private void setTail(String _val) {
-    	tailNumber = _val;
+    private void setID(int _val) {
+    	ID = _val;
     }
 
 	/**
@@ -63,7 +63,6 @@ public class EditAirplane extends HttpServlet {
 		    			"		<table border=\"2\">\n" + 
 		    			"			<tbody>\n" + 
 		    			"				<tr>\n" + 
-		    			"					<td>Tail Number</td>\n" + 
 		    			"					<td>Manufacturer</td>\n" + 
 		    			"					<td>Model</td>\n" + 
 		    			"					<td>Economy Count</td>\n" + 
@@ -72,7 +71,7 @@ public class EditAirplane extends HttpServlet {
 		    			"					<td>Airline</td>\n" + 
 		    			"				</tr>\n" + 
 		    			"				<tr>\n" + 
-		    			"					<td><input name=\"tailNumber\" value = \""+ rs.getString("TailNumber") +"\"/></td>\n" + 
+		    			//"					<td><input name=\"tailNumber\" value = \""+ rs.getString("TailNumber") +"\"/></td>\n" + 
 		    			"					<td><input name=\"manufacturer\" value = \""+rs.getString("Manufacturer")+"\"    /></td>\n" + 
 		    			"					<td><input name=\"model\" value = \""+ rs.getString("Model")+"\" /></td>\n" + 
 		    			"					<td><input name=\"economyCount\" type = \"number\" min=\"0\" value = \""+ rs.getInt("EconomyCount") + "\"/></td>\n" + 
@@ -121,15 +120,16 @@ public class EditAirplane extends HttpServlet {
 			
 		}
 		else {
-			this.setTail(tailNumber);
+			int x = Integer.parseInt(tailNumber);
+			this.setID(x);
 			Connection con;
 			try {
 				con = DriverManager.getConnection(  
 						"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");
 					
 				PreparedStatement stmt;		
-				stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount, Airline from AircraftTable where TailNumber = ?");
-				stmt.setString(1, tailNumber);
+				stmt=con.prepareStatement("Select  Manufacturer, Model, EconomyCount, BusinessCount, FirstCount, Airline from AircraftTable where AircraftID = ?");
+				stmt.setInt(1, x);
 				
 
 				PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
@@ -154,7 +154,7 @@ public class EditAirplane extends HttpServlet {
 		// TODO Auto-generated method stub
 		//String forwardAddress = "";
 		if(request.getParameter("click").equals("Update")) {
-			String _tailNumber = "";
+//			String _tailNumber = "";
 			String manufacturer = "";
 			String model = "";
 			String economy = "";
@@ -168,11 +168,11 @@ public class EditAirplane extends HttpServlet {
 			int x3 = 0;
 			
 			
-			if(request.getParameter("tailNumber") != null) {
-				_tailNumber = request.getParameter("tailNumber");
-			}else {
-				error = "Tail number cannot be empty. ";
-			}
+//			if(request.getParameter("tailNumber") != null) {
+//				_tailNumber = request.getParameter("tailNumber");
+//			}else {
+//				error = "Tail number cannot be empty. ";
+//			}
 			
 			if(request.getParameter("manufacturer") != null) {
 				manufacturer = request.getParameter("manufacturer");
@@ -221,7 +221,7 @@ public class EditAirplane extends HttpServlet {
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 					PreparedStatement stmt=con.prepareStatement("Update AircraftTable set Manufacturer = ?,"
-							+ " Model = ?, EconomyCount = ?, BusinessCount = ?, FirstCount = ?, TailNumber = ?, Airline = ? where TailNumber = ? ");  
+							+ " Model = ?, EconomyCount = ?, BusinessCount = ?, FirstCount = ?,  Airline = ? where AircraftID = ? ");  
 				
 	
 					stmt.setString(1, manufacturer);
@@ -232,10 +232,10 @@ public class EditAirplane extends HttpServlet {
 					stmt.setInt(4, x2);
 	
 					stmt.setInt(5, x3);
-					stmt.setString(6, _tailNumber);
-					stmt.setString(7, airline);
+//					stmt.setString(6, _tailNumber);
+					stmt.setString(6, airline);
 					
-					stmt.setString(8, this.getTail());
+					stmt.setInt(7, this.getID());
 					
 					int count = stmt.executeUpdate();
 					if(count > 0) {
@@ -261,20 +261,20 @@ public class EditAirplane extends HttpServlet {
 		}
 		else if (request.getParameter("click").equals("Delete")) {
 			String error = "";
-			String _tail = "";
-			if(request.getParameter("tailNumber") != null) {
-				_tail = request.getParameter("tailNumber");
-			}else {
-				error = "Tail number cannot be empty. ";
-			}
+			//String _tail = "";
+//			if(request.getParameter("tailNumber") != null) {
+//				_tail = request.getParameter("tailNumber");
+//			}else {
+//				error = "Tail number cannot be empty. ";
+//			}
 			
 			if(error.length() == 0) {
 				try {
 					Class.forName("com.mysql.jdbc.Driver");  
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-					PreparedStatement stmt=con.prepareStatement("Delete from AircraftTable where TailNumber = ?");
-					stmt.setString(1, _tail);
+					PreparedStatement stmt=con.prepareStatement("Delete from AircraftTable where AircraftID = ?");
+					stmt.setInt(1, this.getID());
 					
 					
 					int count = stmt.executeUpdate();

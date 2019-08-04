@@ -52,9 +52,9 @@ public class ManageAirplanes extends HttpServlet {
 			rowCount++;
 			out.println("<TR>");
 			for (int i = 0; i < columnCount; i++) {
-				if(rsmd.getColumnLabel(i+1).equals("TailNumber")) {
+				if(rsmd.getColumnLabel(i+1).equals("AircraftID")) {
 					out.println("<TD>");
-					out.println("<input name=\"click\" type=\"submit\" value=\""+ rs.getString(i+1)  +"\" /> ");
+					out.println("<input name=\"click\" type=\"submit\" value=\""+ rs.getInt(i+1)  +"\" /> ");
 					
 				}
 				else {
@@ -123,8 +123,7 @@ public class ManageAirplanes extends HttpServlet {
     			"		<p>Add airplane</p>\n" + 
     			"		<table border=\"2\">\n" + 
     			"			<tbody>\n" + 
-    			"				<tr>\n" + 
-    			"					<td>Tail Number</td>\n" + 
+    			"				<tr>\n" + 					
     			"					<td>Manufacturer</td>\n" + 
     			"					<td>Model</td>\n" + 
     			"					<td>Economy Count</td>\n" + 
@@ -133,7 +132,6 @@ public class ManageAirplanes extends HttpServlet {
     			"					<td>Airline</td>\n" + 
     			"				</tr>\n" + 
     			"				<tr>\n" + 
-    			"					<td><input name=\"tailNumber\" /></td>\n" + 
     			"					<td><input name=\"manufacturer\" /></td>\n" + 
     			"					<td><input name=\"model\" /></td>\n" + 
     			"					<td><input name=\"economyCount\" type = \"number\" min=\"0\" value = \"0\"/></td>\n" + 
@@ -178,7 +176,7 @@ public class ManageAirplanes extends HttpServlet {
 			PreparedStatement stmt;	
 			PreparedStatement stmt3 = con.prepareStatement("Select * from AirlineTable");
 			
-			stmt=con.prepareStatement("Select TailNumber, Manufacturer, Model, EconomyCount, BusinessCount, FirstCount, Airline from AircraftTable");  
+			stmt=con.prepareStatement("Select * from AircraftTable");  
 			
 			
 			ResultSet rs = stmt.executeQuery();
@@ -208,13 +206,13 @@ public class ManageAirplanes extends HttpServlet {
 		// TODO Auto-generated method stub
 		//doGet(request, response);
 		if(request.getParameter("click").equals("Add Airplane")) {
-			String tailNumber = "";
+			//String tailNumber = "";
 			String manufacturer = "";
 			String model = "";
 			String economy = "";
 			String business = "";
 			String first = "";
-			String airline = request.getParameter("Airline");
+			String airline = request.getParameter("AirlineName");
 			String error = "";
 			
 			int x = 0;
@@ -222,11 +220,11 @@ public class ManageAirplanes extends HttpServlet {
 			int x3 = 0;
 			
 			
-			if(request.getParameter("tailNumber") != null) {
-				tailNumber = request.getParameter("tailNumber");
-			}else {
-				error = "Tail number cannot be empty. ";
-			}
+//			if(request.getParameter("tailNumber") != null) {
+//				tailNumber = request.getParameter("tailNumber");
+//			}else {
+//				error = "Tail number cannot be empty. ";
+//			}
 			
 			if(request.getParameter("manufacturer") != null) {
 				manufacturer = request.getParameter("manufacturer");
@@ -278,7 +276,7 @@ public class ManageAirplanes extends HttpServlet {
 					Connection con=DriverManager.getConnection(  
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 					PreparedStatement stmt=con.prepareStatement("Insert into AircraftTable (Manufacturer,"
-							+ " Model, EconomyCount, BusinessCount, FirstCount, TailNumber, Airline) Values (?, ?, ?, ?, ?, ?, ?)");  
+							+ " Model, EconomyCount, BusinessCount, FirstCount, Airline) Values (?, ?, ?, ?, ?, ? )");  
 				
 					//RequestDispatcher dispatcher;
 					stmt.setString(1, manufacturer);
@@ -286,8 +284,8 @@ public class ManageAirplanes extends HttpServlet {
 					stmt.setInt(3, x);
 					stmt.setInt(4, x2);
 					stmt.setInt(5, x3);
-					stmt.setString(6, tailNumber);
-					stmt.setString(7, airline);
+					
+					stmt.setString(6, airline);
 					int count = stmt.executeUpdate();
 					if(count > 0) {
 						System.out.println("Inserted");

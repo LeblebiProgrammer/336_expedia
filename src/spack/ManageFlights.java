@@ -114,7 +114,11 @@ public class ManageFlights extends HttpServlet {
 						out.println("<input name=\"click\" type=\"submit\" value=\""+ rs.getString(i+1)  +"\" /> ");
 						
 					}else {
-						out.println("<TD>" + rs.getString(i + 1) + "</TD>");
+						if(rsmd.getColumnLabel(i+1).equals("AirlineName")) {
+							out.println("<TD name = \"aname\" value = \""+rs.getString(i+1)+ "\">" + rs.getString(i + 1) + "</TD>");
+						}else {
+							out.println("<TD>" + rs.getString(i + 1) + "</TD>");
+						}
 					}
 				}
 //				out.println("<input name=\"click\" type=\"submit\" value=\"Book for User\" /> ");
@@ -440,7 +444,6 @@ public class ManageFlights extends HttpServlet {
 		}
 		if(request.getParameter("click") != null) {
 			String str = request.getParameter("click");
-			
 			
 			RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
 			request.setAttribute("_flight", str);
