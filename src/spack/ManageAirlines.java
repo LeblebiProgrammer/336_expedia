@@ -171,7 +171,7 @@ public class ManageAirlines extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		
+		String className = "ManageAirlines";
 		//navigation
 		if(request.getParameter("click").equals("BookUser")) {
 			response.sendRedirect("BookUser");
@@ -247,12 +247,14 @@ public class ManageAirlines extends HttpServlet {
 		else {
 			String id = request.getParameter("click");
 			if(id != null) {
-				//request.setAttribute("TailNumber", tailNumber);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirline");
-				request.setAttribute("_id", id);
-				dispatcher.forward( request, response);
-//				response.sendRedirect("EditAirplane");
-				return;
+				if(!id.equals(className)) {
+					//request.setAttribute("TailNumber", tailNumber);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirline");
+					request.setAttribute("_id", id);
+					dispatcher.forward( request, response);
+	//				response.sendRedirect("EditAirplane");
+					return;
+				}
 			}
 			
 		}

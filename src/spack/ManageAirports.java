@@ -176,6 +176,7 @@ public class ManageAirports extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
+		String className = "ManageAirports";
 		//navigation
 		if(request.getParameter("click").equals("BookUser")) {
 			response.sendRedirect("BookUser");
@@ -271,13 +272,15 @@ public class ManageAirports extends HttpServlet {
 		}
 		else {
 			String code = request.getParameter("click");
-			if(code != null) {
-				//request.setAttribute("TailNumber", tailNumber);
-				RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirport");
-				request.setAttribute("Code", code);
-				dispatcher.forward( request, response);
-//				response.sendRedirect("EditAirplane");
-				return;
+			if(code != null ) {
+				if(!code.equals(className)) {
+					//request.setAttribute("TailNumber", tailNumber);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirport");
+					request.setAttribute("Code", code);
+					dispatcher.forward( request, response);
+	//				response.sendRedirect("EditAirplane");
+					return;
+				}
 			}
 			
 		}

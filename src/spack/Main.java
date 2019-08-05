@@ -2,6 +2,10 @@ package spack;
 
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -13,6 +17,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+
+
+
 
 /**
  * Servlet implementation class Main
@@ -35,6 +43,77 @@ public class Main extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
+		
+		
+		String departureCityDropdown = "?";
+		String returnCityDropdown = "?";
+		
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Connection con=DriverManager.getConnection(  
+					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
+			
+			String departSQL = "SELECT Distinct DepartureCity FROM RuExpedia.FlightsTable FT " + 
+					"	JOIN RuExpedia.FlightInfoTable FIT on (FIT.FlightNumber = FT.FlightNumber)";
+			
+			PreparedStatement departStmt = con.prepareStatement(departSQL);
+			ResultSet rsDepart = departStmt.executeQuery();
+			
+			
+			departureCityDropdown = "<select name = \"origin\" size = \"1\">" + 
+					"<option value = \"\">Select Depart City</option>\n";
+	    	do {
+	    		
+	    		try {
+	    			String option = "<option value = \"" + rsDepart.getString("DepartureCity") + "\">" + rsDepart.getString("DepartureCity") + "</option>\n";
+	    			departureCityDropdown += option;
+	    		}
+	    		catch(Exception e) {
+	    			System.out.print(e.getMessage());
+	    		}
+	    	}while(rsDepart.next());
+	    	departureCityDropdown += "</select>";
+	    	
+	    	
+	    	String returnSQL = "SELECT Distinct DestinationCity FROM RuExpedia.FlightsTable FT " + 
+					"	JOIN RuExpedia.FlightInfoTable FIT on (FIT.FlightNumber = FT.FlightNumber)";
+			
+			PreparedStatement returnStmt = con.prepareStatement(returnSQL);
+			ResultSet rsReturn = returnStmt.executeQuery();
+			
+			
+			returnCityDropdown = "<select name = \"destination\" size = \"1\">"+ 
+					"<option value = \"\">Select Arrival City</option>\n";
+	    	do {
+	    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+	    		try {
+	    			String option = "<option value = \"" + rsReturn.getString("DestinationCity") + "\">" + rsReturn.getString("DestinationCity") + "</option>\n";
+	    			returnCityDropdown += option;
+	    		}
+	    		catch(Exception e) {
+	    			System.out.print(e.getMessage());
+	    		}
+	    	}while(rsReturn.next());
+	    	returnCityDropdown += "</select>";
+	    	
+	    	
+					
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			//departureCityDropdown = "Error: " ;
+			e.printStackTrace();
+		}  
+		
+		
+		
+		
+		request.setAttribute("_departureCityDroddown", departureCityDropdown);
+		request.setAttribute("_returnCityDroddown", returnCityDropdown);
+		
+		
+		
+		
+		
 		
 		String fromDate = "";
 		String returnDate = "";
@@ -202,28 +281,31 @@ public class Main extends HttpServlet {
 			}
 			
 			//roundTripBox
-			String roundTrip = request.getParameter("roundTripBox");
-			if(roundTrip != null) {
-				if(roundTrip.toLowerCase().equals("on")) {
-					roundTripBox = true;
-				}
-				else {
-					roundTripBox = false;
-				}
-			}
-			else {
-				roundTripBox = false;
-			}
-			String oneWay = request.getParameter("oneWayBox");
-			if(oneWay != null) {
-				if(oneWay.toLowerCase().equals("on")) {
+//			String roundTrip = request.getParameter("roundTripBox");
+//			if(tripType != null) {
+//				if(roundTrip.toLowerCase().equals("on")) {
+//					roundTripBox = true;
+//				}
+//				else {
+//					roundTripBox = false;
+//				}
+//			}
+//			else {
+//				roundTripBox = false;
+//			}
+			String tripType = request.getParameter("tripType");
+			if(tripType != null) {
+				if(tripType.toLowerCase().equals("one_way")) {
 					oneWayBox = true;
+					roundTripBox = false;
 				}
 				else {
 					oneWayBox = false;
+					roundTripBox = true;
 				}
 			}
 			else {
+				roundTripBox = true;
 				oneWayBox = false;
 			}
 			

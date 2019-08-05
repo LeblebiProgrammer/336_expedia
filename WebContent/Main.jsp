@@ -7,6 +7,17 @@
 <head>
 <meta charset="UTF-8">
 <title>Search your next flight</title>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#datepicker_from" ).datepicker();
+    $( "#datepicker_return" ).datepicker();
+  } );
+  </script>
+
 </head>
 
 <body>
@@ -43,27 +54,30 @@
 				<tr style="height: 27px;">
 					<td style="width: 74px; height: 27px; text-align: center;">From</td>
 					<td style="width: 74.921875px; height: 27px; text-align: center;">
-						<input name="origin" type="text" value=${_origin}>
+						${_departureCityDroddown}
+						
 					</td>
 					<td style="width: 74px; height: 27px; text-align: center;">To</td>
 					<td style="width: 74.921875px; height: 27px; text-align: center;">
-						<input name="destination" type="text" value=${_destination}>
+						${_returnCityDroddown}
 					</td>
 				</tr>
 				<tr>
 					<td>One Way</td>
-					<td><input name="oneWayBox" type="checkbox"></td>
+					<td><input name="tripType" type="radio" value="one_way"></td>
 					<td>Round trip</td>
-					<td><input name="roundTripBox" type="checkbox" checked></td>
+					<td><input name="tripType" type="radio" checked value="round_trip"></td>
 				</tr>
 				<tr>
 					<td style="width: 74px; height: 27px; text-align: center;">When</td>
 					<td style="width: 74.921875px; height: 27px; text-align: center;">
-						<input type="date" name="fromDate" value=${_fromDate} >
+						<input type="date" name="fromDate" value=${_fromDate} id="datepicker_from">
 					</td>
 					<td style="width: 74px; height: 27px; text-align: center;">Return</td>
-					<td style="width: 74.921875px; height: 27px; text-align: center;"><input
-						name="returnDate" type="date" value=${_returnDate}  ></td>
+					<td style="width: 74.921875px; height: 27px; text-align: center;">
+						
+						<input type="date" name="returnDate" value=${_returnDate} id="datepicker_return">
+					</td>
 				</tr>
 			</tbody>
 		</table>

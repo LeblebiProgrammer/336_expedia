@@ -282,6 +282,37 @@ public class ManageFlights extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
+		String className = "ManageFlights";
+		//navigation
+			if(request.getParameter("click").equals("BookUser")) {
+				response.sendRedirect("BookUser");
+				return;
+			}
+			if(request.getParameter("click").equals("ChangeFlight")) {
+				response.sendRedirect("ChangeFlight");
+				return;
+			}
+			if(request.getParameter("click").equals("ManageFlights")) {
+				
+			}
+			if(request.getParameter("click").equals("ManageAirlines")) {
+				response.sendRedirect("ManageAirlines");
+				return;
+			}
+			if(request.getParameter("click").equals("ManageAirports")) {
+				//return;
+				response.sendRedirect("ManageAirports");
+				return;
+			}
+			if(request.getParameter("click").equals("ManageAirplanes")) {
+				response.sendRedirect("ManageAirplanes");
+				return;
+			}
+			if(request.getParameter("click").equals("GetWaitlist")) {
+				response.sendRedirect("GetWaitlist");
+				return;
+			}
+	
 		
 		if(request.getParameter("click").equals("Add Flight")) {
 			String flightNumber = request.getParameter("FlightNumber");
@@ -348,7 +379,7 @@ public class ManageFlights extends HttpServlet {
 						}
 				        LocalTime.parse(_tdemp);
 				        //System.out.println("Valid time string: " + _tdemp);
-				        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
+				        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 				        departureTime =  new java.sql.Time(dateFormat.parse(_tdemp).getTime());
 				        
 				    } catch (Exception e) {
@@ -371,7 +402,7 @@ public class ManageFlights extends HttpServlet {
 //					}
 					try {
 				        LocalTime.parse(_tarr);
-				        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
+				        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
 				        
 				        arrivalTime = new java.sql.Time(dateFormat.parse(_tarr).getTime());
 				    } catch (Exception e) {
@@ -397,9 +428,9 @@ public class ManageFlights extends HttpServlet {
 					stmt.executeUpdate();
 					con.close();
 					
-					request.setAttribute("flightNumber", flightNumber);
-//					RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
-//					dispatcher.forward(request, response);
+					request.setAttribute("_flight", flightNumber);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
+					dispatcher.forward(request, response);
 //					return;
 					
 				}catch(Exception e) {
@@ -412,43 +443,14 @@ public class ManageFlights extends HttpServlet {
 				this.setError(_error);
 			}
 		}
-		
-		//navigation
-		if(request.getParameter("click").equals("BookUser")) {
-			response.sendRedirect("BookUser");
-			return;
-		}
-		if(request.getParameter("click").equals("ChangeFlight")) {
-			response.sendRedirect("ChangeFlight");
-			return;
-		}
-		if(request.getParameter("click").equals("ManageFlights")) {
-			
-		}
-		if(request.getParameter("click").equals("ManageAirlines")) {
-			response.sendRedirect("ManageAirlines");
-			return;
-		}
-		if(request.getParameter("click").equals("ManageAirports")) {
-			//return;
-			response.sendRedirect("ManageAirports");
-			return;
-		}
-		if(request.getParameter("click").equals("ManageAirplanes")) {
-			response.sendRedirect("ManageAirplanes");
-			return;
-		}
-		if(request.getParameter("click").equals("GetWaitlist")) {
-			response.sendRedirect("GetWaitlist");
-			return;
-		}
-		if(request.getParameter("click") != null) {
+		else if(request.getParameter("click") != null) {
 			String str = request.getParameter("click");
-			
-			RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
-			request.setAttribute("_flight", str);
-			dispatcher.forward(request, response);
-			return;
+			if(!str.equals(className)) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher("EditFlight");
+				request.setAttribute("_flight", str);
+				dispatcher.forward(request, response);
+				return;
+			}
 			
 		}
 		
