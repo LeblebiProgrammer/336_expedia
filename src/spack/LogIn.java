@@ -100,7 +100,7 @@ public class LogIn extends HttpServlet {
 						"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia", "ssg103",
 						"password");
 				PreparedStatement stmt = con.prepareStatement(
-						"Select FirstName,AccountType from UserTable where EmailAddress = ? and Password = ?");
+						"Select FirstName, ID, AccountType from UserTable where EmailAddress = ? and Password = ?");
 
 				stmt.setString(1, email);
 				stmt.setString(2, password);
@@ -110,15 +110,16 @@ public class LogIn extends HttpServlet {
 				int count = 0;
 				String fname = "";
 				int type = 0;
+				int id = 0;
 				while (rs.next()) {
 					count++;
 					fname = rs.getString("FirstName");
 					type = Integer.parseInt(rs.getString("AccountType"));
-
+					id = rs.getInt("ID");
 				}
 				con.close();
 				if (count == 1) {
-					User _user = new User(fname, email, type);
+					User _user = new User(fname, email, type, id);
 					HttpSession session = request.getSession();
 					session.setAttribute("username", _user);
 					//response.getWriter().print("aaaa test");

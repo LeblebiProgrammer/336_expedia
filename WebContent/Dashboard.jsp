@@ -21,28 +21,13 @@
 			<tbody>
 				<tr style="height: 27px;">
 					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Change Flight" /></td>
+						name="click" type="submit" value="Cancel Reservations" /></td>
 				</tr>
 				<tr style="height: 27px;">
 					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Cancel" /></td>
+						name="click" type="submit" value="View Reservations" /></td>
 				</tr>
-				<tr style="height: 27px;">
-					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Manage Flights" /></td>
-				</tr>
-				<tr style="height: 27px;">
-					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Manage Airlines" /></td>
-				</tr>
-				<tr style="height: 27px;">
-					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Manage Users" /></td>
-				</tr>
-				<tr style="height: 27px;">
-					<td style="width: 260px; height: 27px; text-align: center;"><input
-						name="click" type="submit" value="Book User" /></td>
-				</tr>
+				
 			</tbody>
 		</table>
 	</div>

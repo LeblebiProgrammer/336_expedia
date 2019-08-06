@@ -104,11 +104,21 @@ public class SignUp extends HttpServlet {
 			stmt.setString(4, "3");
 			stmt.setString(5, emailAddress);
 			
+			int id = 0;
 			int count = stmt.executeUpdate();
+			
+			PreparedStatement stmt2 = con.prepareStatement("Select ID from UserTable where emailAddress = ? and password = ?");  
+			stmt2.setString(1, emailAddress);
+			stmt2.setString(2, password);
+			
+			ResultSet rs = stmt2.executeQuery();
+			if(rs.next()) {
+				id = rs.getInt("ID");
+			}
 			
 			if(count>0) {
 				//sign up screen is for users only so we can set the account type directly to 3
-				User _user = new User(firstName, emailAddress, 3);
+				User _user = new User(firstName, emailAddress, 3, id);
 				HttpSession session = request.getSession();
 				session.setAttribute("username", _user);
 				request.setAttribute("value", "Welcome " + firstName);

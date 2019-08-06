@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -44,6 +45,7 @@ public class FlightSearch extends HttpServlet {
 	private String _tripTypeCache = "";
 	private String _orderBy = "";
 	private Boolean _isPostback = false;
+	private Boolean _showFlexDates = false;
 	
 	private void setError(String val) {
 		error = val;
@@ -62,7 +64,17 @@ public class FlightSearch extends HttpServlet {
     			"</head>\n" + 
     			"<body>\n" + 
     			"	<form action=\"FlightSearch\" method=\"post\">\n" +
-    			"		<p><a href=\"Main\">&lt;Back</a>\n" ;
+    			"		<p><a href=\"Main\">&lt;Back</a>\n<br/><br/><br/>";
+    	
+    	
+    	if (_showFlexDates) {
+    		str += "<input name=\"showFlex\" type=submit value=\"Show Exact Dates\"/> ";
+    	} else {
+    		str += "<input name=\"showFlex\" type=submit value=\"Show Flex Dates\"/> ";
+    	}
+    			
+    			
+    			
     	
     	//"		<input type=hidden name=\"fromDate\" value=\"\" />" ;
     			
@@ -170,8 +182,13 @@ public class FlightSearch extends HttpServlet {
 				_tripTypeCache = request.getParameter("tripType");
 			}
 			
-			RunSearchResult(con, response);
-			
+			if (_showFlexDates) {
+				RunFlexSearchResult(con, response);
+				
+				
+			} else {  // exact date search 
+				RunSearchResult(con, response);
+			}
 			
 			
 		}
@@ -181,30 +198,197 @@ public class FlightSearch extends HttpServlet {
 	}
 	
 	
-	private void RunSearchResult(Connection con, HttpServletResponse response) {
+	private void RunFlexSearchResult(Connection con, HttpServletResponse response) {
 		
 		
 		try {
 			int departWeekDay = getWeekDay(_departDateCache);
 			int returnWeekDay = getWeekDay(_returnDateCache);
 			
+			initialHtml(response.getWriter());
 			
-			//boolean oneWayBox = false;
-			//boolean roundTripBox = true;
-//			if(_tripTypeCache != null) {
-//				if(_tripTypeCache.toLowerCase().equals("one_way")) {
-//					oneWayBox = true;
-//					roundTripBox = false;
-//				}
-//				else {
-//					oneWayBox = false;
-//					roundTripBox = true;
-//				}
+			String _error = "";
+			
+			if(this.getError() != null) {
+				_error = this.getError();
+			}
+			else {
+				_error = "";
+			}
+			
+			String departSQL = "SELECT 	MIN(FT.PublishedEconomyPrice) as minPrice , FT.Day\n" + 
+					"			FROM RuExpedia.FlightsTable FT\n" + 
+					"			INNER JOIN RuExpedia.FlightInfoTable FIT ON (FIT.FlightNumber = FT.FlightNumber)\n" + 
+					"			INNER JOIN RuExpedia.AircraftTable CT ON (CT.AircraftID = FT.AircraftID) \n" + 
+					"			WHERE  FIT.DepartureCity = '" + _departCityCache + "' AND FIT.DestinationCity = '" + _returnCityCache + "'\n" + 
+					"           GROUP BY FT.Day" ; 
+					
+			PreparedStatement departStmt = con.prepareStatement(departSQL);
+			ResultSet rsDepart = departStmt.executeQuery();
+			
+			int departNumbers[]=new int[7];  
+			for(int i=0;i<departNumbers.length -1;i++) {
+				departNumbers[i] = -1;
+			}
+			while(rsDepart.next()) {
+				
+				int iIndex = Integer.parseInt(rsDepart.getString("Day")) - 1;
+				departNumbers[iIndex] = Integer.parseInt(rsDepart.getString("minPrice"));
+	    		
+	    	}
+			
+			String returnSQL = "SELECT 	MIN(FT.PublishedEconomyPrice) as minPrice , FT.Day\n" + 
+					"			FROM RuExpedia.FlightsTable FT\n" + 
+					"			INNER JOIN RuExpedia.FlightInfoTable FIT ON (FIT.FlightNumber = FT.FlightNumber)\n" + 
+					"			INNER JOIN RuExpedia.AircraftTable CT ON (CT.AircraftID = FT.AircraftID) \n" + 
+					"			WHERE  FIT.DestinationCity = '" + _departCityCache + "' AND FIT.DepartureCity = '" + _returnCityCache + "'\n" + 
+					"           GROUP BY FT.Day" ; 
+					
+			PreparedStatement returnStmt = con.prepareStatement(returnSQL);
+			ResultSet rsReturn = returnStmt.executeQuery();
+			
+			int returnNumbers[]=new int[7];  
+			for(int i=0;i<returnNumbers.length -1;i++) {
+				returnNumbers[i] = -1;
+			}
+			while(rsReturn.next()) {
+				
+				int iIndex = Integer.parseInt(rsReturn.getString("Day")) - 1;
+				returnNumbers[iIndex] = Integer.parseInt(rsReturn.getString("minPrice"));
+	    		
+	    	}
+			
+			
+			String[] departDates = new String[7];
+			int iDate = 0;
+			for(int i=-3;i<4;i++) {  // find departDates +-3 and selected date
+			
+				DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+				DateFormat dateFormatOut = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
+				java.util.Date date;
+				try {
+				    date = dateFormat.parse(_departDateCache);
+				    Calendar calendar = Calendar.getInstance();
+			        calendar.setTime(date);
+			        calendar.add(Calendar.DAY_OF_MONTH, i);
+			        departDates[iDate] = dateFormatOut.format(calendar.getTime());  
+			        
+//			        DateTimeFormatter f = DateTimeFormatter.ofPattern( "MMM uuuu" , Locale.US ) ;
+//			        String output = ym.format( f ) ;
+				    
+				} 
+				catch (ParseException e) {
+				    e.printStackTrace();
+				}
+				iDate ++;
+			
+			}
+			
+			String[] returnDates = new String[7];
+			iDate = 0;
+			for(int i=-3;i<4;i++) {  // find departDates +-3 and selected date
+			
+				DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+				DateFormat dateFormatOut = new SimpleDateFormat("dd MMM", Locale.ENGLISH);
+				java.util.Date date;
+				try {
+				    date = dateFormat.parse(_returnDateCache);
+				    Calendar calendar = Calendar.getInstance();
+			        calendar.setTime(date);
+			        calendar.add(Calendar.DAY_OF_MONTH, i);
+			        returnDates[iDate] = dateFormatOut.format(calendar.getTime());  
+				    
+				} 
+				catch (ParseException e) {
+				    e.printStackTrace();
+				}
+				iDate ++;
+			
+			}
+			
+			
+			
+			//"		<p>" + Caption + " " + FlightDate + " From:" + FlightFrom + " To:" + FlightTo +  "</p>\n" + 
+			String str = "<div>\n" + 
+	    			"		<br> <br> <br> <br>\n" + 
+	    			"		<table border=\"2\">\n" + 
+	    			"			<tbody>\n" + 
+	    			"				<tr>\n" + 
+	    			"					<td width=\"100\">&nbsp;</td>\n" ;
+			
+			for(int i=0;i<departDates.length ;i++) {
+			
+	    			str += "<td width = \"100\">" +  departDates[i] +   "</td>\n" ;
+			}
+			str += "</tr>";
+			
+			
+			
+			
+			for(Integer iX=0;iX<returnDates.length ;iX++) {
+				str += "<tr>";	
+    			str += "<td width = \"100\">" +  returnDates[iX] +   "</td>\n" ;
+    			
+    			for(Integer iY=0;iY<7 ;iY++) {
+    				
+    				int FlightTotal = -1 ;
+    				String dayTotal = "&nbsp;";
+    				if ((departNumbers[iX] > -1) && (returnNumbers[iX] > -1)) {
+    					FlightTotal = departNumbers[iX] + returnNumbers[iX];
+    					dayTotal = String.format("%,d", FlightTotal);
+    				}
+    				
+    				
+    				str += "<td width = \"100\">" +  dayTotal +   "</td>\n" ;	
+    			}
+    			
+    			str += "</tr>";
+		}
+			
+			
+			str += "</table>";
+			response.getWriter().print(str);
+			
+			//displayResult("Departing Flights", _departDateCache, _departCityCache, _returnCityCache,  response.getWriter(), rsDepart, "depart", _error);
+			
+//			if (_tripTypeCache.equals("round_trip")) {
+//				
+//				String returnSQL = "SELECT FT.FlightsID, FT.FlightNumber, FIT.AirlineName, FT.AircraftID, CT.Model, \n" + 
+//						"		FT.PublishedEconomyPrice, FT.PublishedBusinessPrice, \n" + 
+//						"        FT.PublishedFirstPrice , FIT.DepartureTime, FIT.ArrivalTime\n" + 
+//						"        FROM RuExpedia.FlightsTable FT\n" + 
+//						"        INNER JOIN RuExpedia.FlightInfoTable FIT ON (FIT.FlightNumber = FT.FlightNumber) \n" + 
+//						"        INNER JOIN RuExpedia.AircraftTable CT ON (CT.AircraftID = FT.AircraftID) \n" +
+//						"        WHERE FT.Day = " + returnWeekDay + " AND FIT.DepartureCity = '" + _returnCityCache + "' AND FIT.DestinationCity = '" + _departCityCache + "'\n" + 
+//						_orderBy;
+//
+//				PreparedStatement returnStmt = con.prepareStatement(returnSQL);
+//				ResultSet rsReturn = returnStmt.executeQuery();
+//				displayResult("Return Flights", _returnDateCache, _returnCityCache, _departCityCache, response.getWriter(), rsReturn, "return", _error);
+//				
 //			}
-//			else {
-//				roundTripBox = true;
-//				oneWayBox = false;
-//			}
+			
+
+			con.close();
+		} catch (Exception ex) {
+			try {
+				response.getWriter().print(ex.getMessage());
+			} catch (Exception e) {
+				
+			}
+		}
+		
+		
+	}
+	
+	
+	
+	private void RunSearchResult(Connection con, HttpServletResponse response) {
+		
+		
+		try {
+			int departWeekDay = getWeekDay(_departDateCache);
+			int returnWeekDay = getWeekDay(_returnDateCache);
 			
 			initialHtml(response.getWriter());
 			
@@ -263,6 +447,26 @@ public class FlightSearch extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		
+		
+		try {
+			if (request.getParameter("showFlex").equals("Show Flex Dates")) {
+				_isPostback = true;
+				_showFlexDates = true;
+			} 
+			
+		} catch (Exception ex) {
+			
+		}
+		
+		try {
+			if (request.getParameter("showFlex").equals("Show Exact Dates")) {
+				_isPostback = true;
+				_showFlexDates = false;
+			} 
+			
+		} catch (Exception ex) {
+			
+		}
 		
 		
 		
@@ -376,153 +580,7 @@ public class FlightSearch extends HttpServlet {
 			
 		}
 		
-		
-//		if(request.getParameter("click").equals("Add Flight")) {
-//			String flightNumber = request.getParameter("FlightNumber");
-//			String tailNumber = request.getParameter("TailNumber");
-//			String airlineName = request.getParameter("AirlineName");
-//			String departure = request.getParameter("Departure");
-//			String arrival = request.getParameter("Arrival");
-//			Time departureTime = new Time(0);
-//			
-//			String _tdemp = request.getParameter("DepartureTime");
-//			Time arrivalTime = new Time(0);
-//			String _tarr = request.getParameter("ArrivalTime");
-//		
-//			this.setError("");
-//			String _error = "";
-//			
-//			if(flightNumber == null) {
-//				_error = "Flight number cannot be empty. ";
-//			}else {
-//				if(flightNumber.length() == 0 ) {
-//					_error = "Flight number cannot be empty. ";
-//				}
-//			}
-//			if(tailNumber == null) {
-//				_error += "Tail number cannot be empty. ";
-//			}else {
-//				if(tailNumber.length() == 0) {
-//					_error += "Tail number cannot be empty. ";
-//				}
-//			}
-//			if(airlineName == null) {
-//				_error += "Airline name cannot be empty. ";
-//			}else {
-//				if(airlineName.length() == 0) {
-//					_error += "Airline name cannot be empty. ";
-//				}
-//			}
-//			if(departure == null) {
-//				_error += "Departure name cannot be empty. ";
-//			}else {
-//				if(departure.length() != 0) {
-//					_error += "Departure name must have 3 characters. ";
-//				}
-//			}
-//			if(arrival == null) {
-//				_error += "Arrival name cannot be empty. ";
-//			}else {
-//				if(arrival.length() != 3) {
-//					_error += "Arrival name must have 3 characters. ";
-//				}
-//			}
-//			if(_tdemp == null) {
-//				_error += "Departure time cannot be empty. ";
-//			}else {
-//				if(_tdemp.length() == 0) {
-//					_error += "Departure time cannot be empty. ";
-//				}else {
-//					try {
-//				        LocalTime.parse(_tdemp);
-//				        //System.out.println("Valid time string: " + _tdemp);
-//				        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
-//				        departureTime =  new java.sql.Time(dateFormat.parse(_tdemp).getTime());
-//				        
-//				    } catch (Exception e) {
-//				    	_error += "Invalid time for departure time";
-//				    }
-//				}
-//			}
-//			if(_tarr == null) {
-//				_error += "Arrival time cannot be empty";
-//			}else {
-//				if(_tarr.length() == 0) {
-//					_error += "Arrival time cannot be empty";
-//				}else {
-////					try {
-////						DateFormat dateFormat = new SimpleDateFormat("hh:mm");
-////						dateFormat.parse(arrivalTime);
-////					
-////					}catch(Exception e) {
-////						_error += e.getMessage();
-////					}
-//					try {
-//				        LocalTime.parse(_tarr);
-//				        DateFormat dateFormat = new SimpleDateFormat("hh:mm");
-//				        
-//				        arrivalTime = new java.sql.Time(dateFormat.parse(_tarr).getTime());
-//				    } catch (Exception e) {
-//				        //System.out.println("Invalid time string: " + arrivalTime);
-//				    	_error += "Invalid time for arrival time";
-//				    }
-//				}
-//			}if(_error.length() == 0) {
-//				try {
-//					Class.forName("com.mysql.jdbc.Driver");  
-//					Connection con=DriverManager.getConnection(  
-//					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-//					PreparedStatement stmt=con.prepareStatement("Insert into FlightInfoTable (FlightNumber, TailNumber, AirlineName, DepartureCity, DesinationCity, DepartureTime, ArrivalTime) Values (?, ?, ?, ?, ?, ?, ?)");  
-//					
-//					stmt.setString(1, flightNumber);
-//					stmt.setString(2, tailNumber);
-//					stmt.setString(3, airlineName);
-//					stmt.setString(4, departure);
-//					stmt.setString(5, arrival);
-//					stmt.setTime(6, departureTime);
-//					stmt.setTime(7, arrivalTime);
-//					
-//					
-//				}catch(Exception e) {
-//					_error += e.getMessage();
-//				}
-//			}
-//			
-//			if(_error.length() > 0) {
-//				this.setError(_error);
-//			}
-//		}
-//		
-//		//navigation
-//		if(request.getParameter("click").equals("BookUser")) {
-//			response.sendRedirect("BookUser");
-//			return;
-//		}
-//		if(request.getParameter("click").equals("ChangeFlight")) {
-//			response.sendRedirect("ChangeFlight");
-//			return;
-//		}
-//		if(request.getParameter("click").equals("ManageFlights")) {
-//			
-//		}
-//		if(request.getParameter("click").equals("ManageAirlines")) {
-//			response.sendRedirect("ManageAirlines");
-//			return;
-//		}
-//		if(request.getParameter("click").equals("ManageAirports")) {
-//			//return;
-//			response.sendRedirect("ManageAirports");
-//			return;
-//		}
-//		if(request.getParameter("click").equals("ManageAirplanes")) {
-//			response.sendRedirect("ManageAirplanes");
-//			return;
-//		}
-//		if(request.getParameter("click").equals("GetWaitlist")) {
-//			response.sendRedirect("GetWaitlist");
-//			return;
-//		}
-//		
+			
 		
 		doGet(request, response);
 	}

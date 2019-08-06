@@ -37,7 +37,7 @@ public class Dashboard extends HttpServlet {
 		String address = "";
 		if(_user != null){
 			if(_user.getType() == 3) {
-				address = "Dashboard.jsp";
+				address = "ViewReservations";
 			}
 			else if(_user.getType() == 2) {
 				address = "Dashboardcr.jsp";
