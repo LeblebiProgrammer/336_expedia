@@ -1,7 +1,6 @@
 package spack;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -65,9 +64,8 @@ public class LogIn extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		boolean refresh = true;
 		if (request.getParameter("click").equals("Log in")) {
-			refresh = false;
+			//refresh = false;
 			String email = "";
 			String password = "";
 

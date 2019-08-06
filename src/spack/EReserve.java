@@ -133,8 +133,6 @@ private String reservationNumber = "";
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//response.getWriter().append("Served at: ").append(request.getContextPath());
-		int x = 0;
-		x++;
 		try {
 			String str = (String) request.getAttribute("Reservation");
 //			String str = "ATH11";

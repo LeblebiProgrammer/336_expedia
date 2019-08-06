@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Calendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -159,7 +158,7 @@ public class EditReservation extends HttpServlet {
 		 
 					//java.sql.Date date = new java.sql.Date(Calendar.getInstance().getTime().getTime());
 					
-					stmt.setString(1, str);
+					stmt.setString(1, this.getReservation());
 					
 					//System.out.println(dtf.format(now)); 
 					
