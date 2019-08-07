@@ -2,7 +2,6 @@ package spack;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -303,7 +302,7 @@ public class BookUserConfirm extends HttpServlet {
 			if (request.getParameter("click").equals("Buy")) {
 				String str = request.getParameter("tripType");
 				String code = randomAlphaNumeric(5);
-				String ff = request.getParameter(str);
+				
 				int type = 0;
 				int price = -1;
 				if (str.contains("Economy")) {

@@ -282,7 +282,7 @@ public class ManageFlights extends HttpServlet {
 		String className = "ManageFlights";
 		//navigation
 			if(request.getParameter("click").equals("BookUser")) {
-				response.sendRedirect("BookUser");
+				response.sendRedirect("BookForUser");
 				return;
 			}
 			if(request.getParameter("click").equals("ChangeFlight")) {

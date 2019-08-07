@@ -181,6 +181,7 @@ public class ManageUsers extends HttpServlet {
 		
 		//navigation
 		if(request.getParameter("click").equals("Manage users")) {
+			
 		}
 		if(request.getParameter("click").equals("GetSales")) {
 			response.sendRedirect("GetSales");
@@ -192,10 +193,6 @@ public class ManageUsers extends HttpServlet {
 		}
 		if(request.getParameter("click").equals("GetRevenue")) {
 			response.sendRedirect("GetRevenue");
-			return;
-		}
-		if(request.getParameter("click").equals("GetWaitlist")) {
-			response.sendRedirect("GetWaitlist");
 			return;
 		}
 		if(request.getParameter("click").equals("GetFlightHistory")) {

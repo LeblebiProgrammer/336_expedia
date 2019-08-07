@@ -174,7 +174,7 @@ public class ManageAirlines extends HttpServlet {
 		String className = "ManageAirlines";
 		//navigation
 		if(request.getParameter("click").equals("BookUser")) {
-			response.sendRedirect("BookUser");
+			response.sendRedirect("BookForUser");
 			return;
 		}
 		if(request.getParameter("click").equals("ChangeFlight")) {
@@ -198,6 +198,7 @@ public class ManageAirlines extends HttpServlet {
 		}
 		if(request.getParameter("click").equals("GetWaitlist")) {
 			response.sendRedirect("GetWaitlist");
+			return;
 		}
 		
 		

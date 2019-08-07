@@ -89,7 +89,7 @@ public class Dashboard extends HttpServlet {
 		
 		//for cr
 		if(request.getParameter("click").equals("BookUser")) {
-			response.sendRedirect("BookUser");
+			response.sendRedirect("BookForUser");
 			return;
 		}
 		if(request.getParameter("click").equals("ChangeFlight")) {
