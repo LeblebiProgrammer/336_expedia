@@ -44,8 +44,10 @@ public class FlightSearch extends HttpServlet {
 	private String _returnCityCache = "";
 	private String _tripTypeCache = "";
 	private String _orderBy = "";
+	private String _selectedDays = "";
 	private Boolean _isPostback = false;
 	private Boolean _showFlexDates = false;
+	private Boolean _selectFlexDate = false;
 	
 	private void setError(String val) {
 		error = val;
@@ -70,7 +72,12 @@ public class FlightSearch extends HttpServlet {
     	if (_showFlexDates) {
     		str += "<input name=\"showFlex\" type=submit value=\"Show Exact Dates\"/> ";
     	} else {
-    		str += "<input name=\"showFlex\" type=submit value=\"Show Flex Dates\"/> ";
+    		if (_selectFlexDate) {
+    			
+    		} else {
+    			str += "<input name=\"showFlex\" type=submit value=\"Show Flex Dates\"/> ";	
+    		}
+    		
     	}
     			
     			
@@ -83,47 +90,7 @@ public class FlightSearch extends HttpServlet {
     }
   
 	
-    protected void displayResult(String Caption, String FlightDate, String FlightFrom, String FlightTo, java.io.PrintWriter out, ResultSet results, String segmentType, String error) throws SQLException {
-    	String str = "<div>\n" + 
-    			"		<br> <br> <br> <br>\n" + 
-    			"		<p>" + Caption + " " + FlightDate + " From:" + FlightFrom + " To:" + FlightTo +  "</p>\n" + 
-    			"		<table border=\"2\">\n" + 
-    			"			<tbody>\n" + 
-    			"				<tr>\n" + 
-    			"					<td>Flight Number</td>\n" + 
-    			"					<td width = \"15%\">Aircraft</td>\n" +
-    			"					<td>Airline Name</td>\n" + 
-    			"					<td>Departure<br><input name=\"orderDep\" type=submit value=\"asc\"/><input name=\"orderDep\" type=submit value=\"dsc\"/></td>\n" + 
-    			"					<td>Arrival<br><input name=\"orderArr\" type=submit value=\"asc\"/><input name=\"orderArr\" type=submit value=\"dsc\"/></td>\n" +
-    			"					<td>Coach Class<br><input name=\"orderPriCoach\" type=submit value=\"asc\"/><input name=\"orderPriCoach\" type=submit value=\"dsc\"/></td>\n" + 
-    			"					<td>Business Class<br><input name=\"orderPriBuss\" type=submit value=\"asc\"/><input name=\"orderPriBuss\" type=submit value=\"dsc\"/></td>\n" +
-    			"					<td>First Class<br><input name=\"orderPriFrst\" type=submit value=\"asc\"/><input name=\"orderPriFrst\" type=submit value=\"dsc\"/></td>\n" +
-    			"				</tr>\n" ;
-    			
-    	while(results.next()) {
-    		str += "<tr>\n"; 
-    		str += "<td>" + results.getString("FlightNumber") + "</td>\n";
-    		str += "<td>" + results.getString("Model") + "</td>\n";
-    		str += "<td>" + results.getString("AirlineName") + "</td>\n";
-    		str += "<td>" + results.getString("DepartureTime") + "</td>\n";
-    		str += "<td>" + results.getString("ArrivalTime") + "</td>\n";
-    		str += "<td>" + results.getString("PublishedEconomyPrice") +  "<input type=\"radio\"  name=\"departSeat\" value=\"coach_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
-    		str += "<td>" + results.getString("PublishedBusinessPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"business_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
-    		str += "<td>" + results.getString("PublishedFirstPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"first_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
-    		str += "</tr>\n";
-    	}
-//		ResultSetMetaData rsmd = (ResultSetMetaData) aircraft.getMetaData();
-//		int columnCount = rsmd.getColumnCount();
-    	
-    	str +=  "			</tbody>\n" + 
-    			"		</table>\n" + 
-    			"	</div>\n" + 
-    			"	</form>\n" + 
-    			"<p>"+ error + "</p>"+
-    			"</body>\n" + 
-    			"</html>";
-    	out.write(str);
-    }
+    
 	
 	
     private int getWeekDay(String _dateEntered) {
@@ -173,6 +140,17 @@ public class FlightSearch extends HttpServlet {
 				
 			}
 
+			try {
+				if (request.getParameter("selectFlex").equals("Select Flight")) {
+					_isPostback = true;
+					_showFlexDates = false;
+					_selectFlexDate = true;
+				} 
+				
+			} catch (Exception ex) {
+				
+			}
+			
 			
 			if (!_isPostback ) {
 				_departDateCache = request.getParameter("fromDate").toString();
@@ -180,14 +158,17 @@ public class FlightSearch extends HttpServlet {
 				_departCityCache = request.getParameter("origin").toString();
 				_returnCityCache = request.getParameter("destination").toString();
 				_tripTypeCache = request.getParameter("tripType");
+				_selectedDays = "";
+				_selectFlexDate = false;
 			}
 			
 			if (_showFlexDates) {
 				RunFlexSearchResult(con, response);
+			} else if (_selectFlexDate) {
 				
-				
-			} else {  // exact date search 
-				RunSearchResult(con, response);
+				RunSearchResult(con, response, _selectedDays); 
+			} else {  
+				RunSearchResult(con, response, "");
 			}
 			
 			
@@ -204,6 +185,8 @@ public class FlightSearch extends HttpServlet {
 		try {
 			int departWeekDay = getWeekDay(_departDateCache);
 			int returnWeekDay = getWeekDay(_returnDateCache);
+			
+			
 			
 			initialHtml(response.getWriter());
 			
@@ -270,11 +253,9 @@ public class FlightSearch extends HttpServlet {
 				    date = dateFormat.parse(_departDateCache);
 				    Calendar calendar = Calendar.getInstance();
 			        calendar.setTime(date);
-			        calendar.add(Calendar.DAY_OF_MONTH, i);
+			        calendar.add(Calendar.DAY_OF_MONTH, i-1);
 			        departDates[iDate] = dateFormatOut.format(calendar.getTime());  
-			        
-//			        DateTimeFormatter f = DateTimeFormatter.ofPattern( "MMM uuuu" , Locale.US ) ;
-//			        String output = ym.format( f ) ;
+
 				    
 				} 
 				catch (ParseException e) {
@@ -295,7 +276,7 @@ public class FlightSearch extends HttpServlet {
 				    date = dateFormat.parse(_returnDateCache);
 				    Calendar calendar = Calendar.getInstance();
 			        calendar.setTime(date);
-			        calendar.add(Calendar.DAY_OF_MONTH, i);
+			        calendar.add(Calendar.DAY_OF_MONTH, i-1);
 			        returnDates[iDate] = dateFormatOut.format(calendar.getTime());  
 				    
 				} 
@@ -307,8 +288,6 @@ public class FlightSearch extends HttpServlet {
 			}
 			
 			
-			
-			//"		<p>" + Caption + " " + FlightDate + " From:" + FlightFrom + " To:" + FlightTo +  "</p>\n" + 
 			String str = "<div>\n" + 
 	    			"		<br> <br> <br> <br>\n" + 
 	    			"		<table border=\"2\">\n" + 
@@ -321,9 +300,6 @@ public class FlightSearch extends HttpServlet {
 	    			str += "<td width = \"100\">" +  departDates[i] +   "</td>\n" ;
 			}
 			str += "</tr>";
-			
-			
-			
 			
 			for(Integer iX=0;iX<returnDates.length ;iX++) {
 				str += "<tr>";	
@@ -338,35 +314,27 @@ public class FlightSearch extends HttpServlet {
     					dayTotal = String.format("%,d", FlightTotal);
     				}
     				
-    				
-    				str += "<td width = \"100\">" +  dayTotal +   "</td>\n" ;	
+    				String SelectedDay = "";
+    				if ((iX == 3) && (iY == 3)) {
+    					SelectedDay = "checked";
+    				}
+    				if (FlightTotal > 0) {
+    						str += "<td width = \"100\" align=center> "  + "<input type=\"radio\"  name=\"selectedDay\" " + SelectedDay + " value=\""  + departDates[iY] +  "," + departNumbers[iY] + "|" + returnDates[iX] + "," + returnNumbers[iX] + "\"/> $" +  dayTotal + "</td>\n" ;	
+    				} else {
+    						str += "<td width = \"100\" align=center> "  + " N/A</td>\n" ;
+    				}
+    					
     			}
     			
     			str += "</tr>";
 		}
 			
 			
-			str += "</table>";
-			response.getWriter().print(str);
+		str += "</table><br/><br/>";
+		str += "<input name=\"selectFlex\" type=submit value=\"Select Flight\"/> ";
+		response.getWriter().print(str);
 			
-			//displayResult("Departing Flights", _departDateCache, _departCityCache, _returnCityCache,  response.getWriter(), rsDepart, "depart", _error);
 			
-//			if (_tripTypeCache.equals("round_trip")) {
-//				
-//				String returnSQL = "SELECT FT.FlightsID, FT.FlightNumber, FIT.AirlineName, FT.AircraftID, CT.Model, \n" + 
-//						"		FT.PublishedEconomyPrice, FT.PublishedBusinessPrice, \n" + 
-//						"        FT.PublishedFirstPrice , FIT.DepartureTime, FIT.ArrivalTime\n" + 
-//						"        FROM RuExpedia.FlightsTable FT\n" + 
-//						"        INNER JOIN RuExpedia.FlightInfoTable FIT ON (FIT.FlightNumber = FT.FlightNumber) \n" + 
-//						"        INNER JOIN RuExpedia.AircraftTable CT ON (CT.AircraftID = FT.AircraftID) \n" +
-//						"        WHERE FT.Day = " + returnWeekDay + " AND FIT.DepartureCity = '" + _returnCityCache + "' AND FIT.DestinationCity = '" + _departCityCache + "'\n" + 
-//						_orderBy;
-//
-//				PreparedStatement returnStmt = con.prepareStatement(returnSQL);
-//				ResultSet rsReturn = returnStmt.executeQuery();
-//				displayResult("Return Flights", _returnDateCache, _returnCityCache, _departCityCache, response.getWriter(), rsReturn, "return", _error);
-//				
-//			}
 			
 
 			con.close();
@@ -383,12 +351,60 @@ public class FlightSearch extends HttpServlet {
 	
 	
 	
-	private void RunSearchResult(Connection con, HttpServletResponse response) {
+	private void RunSearchResult(Connection con, HttpServletResponse response, String selectedDays) {
 		
 		
 		try {
 			int departWeekDay = getWeekDay(_departDateCache);
 			int returnWeekDay = getWeekDay(_returnDateCache);
+			String departSelect = "";
+			String returnSelect = "";
+			
+			
+			String departDaySelected = "";
+			String departDayPrice = "";
+			String returnDaySelected = "";
+			String returnDayPrice = "";
+			
+			
+			
+			if (!selectedDays.equals("")) {  // this is something like          14 Aug,154|20 Aug,181
+				
+				if (selectedDays.indexOf('|') > 0) {
+					String[] selectionParts = selectedDays.split("\\|");
+					if (selectionParts.length == 2) {
+						departSelect = selectionParts[0];
+						returnSelect = selectionParts[1];
+						
+						String departWords[] = departSelect.split(",");
+						String returnWords[] = returnSelect.split(",");
+						DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+						DateFormat dateFormatOut = new SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH);
+						
+						
+						if (departWords.length == 2) {  // redo the search the selected day with flex search selected date
+							departDaySelected = departWords[0] + " 2019";
+							departDayPrice = departWords[1];
+							java.util.Date date = dateFormatOut.parse(departDaySelected);
+							_departDateCache = dateFormat.format(date);  
+							departWeekDay = getWeekDay(_departDateCache);
+							
+							
+						}
+						
+						if (returnWords.length == 2) { // redo the search the selected day with flex search selected date
+							returnDaySelected = returnWords[0] + " 2019";
+							returnDayPrice = returnWords[1];
+							java.util.Date date = dateFormatOut.parse(returnDaySelected);
+							_returnDateCache = dateFormat.format(date);
+							returnWeekDay = getWeekDay(_returnDateCache);
+						}
+						
+						
+					}
+				}
+			}
+			
 			
 			initialHtml(response.getWriter());
 			
@@ -410,9 +426,11 @@ public class FlightSearch extends HttpServlet {
 					"        WHERE FT.Day = " + departWeekDay + " AND FIT.DepartureCity = '" + _departCityCache + "' AND FIT.DestinationCity = '" + _returnCityCache + "' \n" +
 					_orderBy;
 			
+			System.out.print("SQL1:" + departSQL);
+			
 			PreparedStatement departStmt = con.prepareStatement(departSQL);
 			ResultSet rsDepart = departStmt.executeQuery();
-			displayResult("Departing Flights", _departDateCache, _departCityCache, _returnCityCache,  response.getWriter(), rsDepart, "depart", _error);
+			displayResult("Departing Flights", _departDateCache, _departCityCache, _returnCityCache,  response.getWriter(), rsDepart, "depart", _error, departDayPrice);
 			
 			if (_tripTypeCache.equals("round_trip")) {
 				
@@ -425,9 +443,11 @@ public class FlightSearch extends HttpServlet {
 						"        WHERE FT.Day = " + returnWeekDay + " AND FIT.DepartureCity = '" + _returnCityCache + "' AND FIT.DestinationCity = '" + _departCityCache + "'\n" + 
 						_orderBy;
 
+				System.out.print("SQL2:" + departSQL);
+				
 				PreparedStatement returnStmt = con.prepareStatement(returnSQL);
 				ResultSet rsReturn = returnStmt.executeQuery();
-				displayResult("Return Flights", _returnDateCache, _returnCityCache, _departCityCache, response.getWriter(), rsReturn, "return", _error);
+				displayResult("Return Flights", _returnDateCache, _returnCityCache, _departCityCache, response.getWriter(), rsReturn, "return", _error, returnDayPrice);
 				
 			}
 			
@@ -439,6 +459,64 @@ public class FlightSearch extends HttpServlet {
 		
 		
 	}
+	
+	
+	protected void displayResult(String Caption, String FlightDate, String FlightFrom, String FlightTo, java.io.PrintWriter out, ResultSet results, String segmentType, String error, String selectedPrice) throws SQLException {
+    	
+		
+		boolean selectionMade = false; 
+		String str = "<div>\n" + 
+    			"		<br> <br> <br> <br>\n" + 
+    			"		<p>" + Caption + " " + FlightDate + " From:" + FlightFrom + " To:" + FlightTo +  "</p>\n" + 
+    			"		<table border=\"2\">\n" + 
+    			"			<tbody>\n" + 
+    			"				<tr>\n" + 
+    			"					<td>Flight Number</td>\n" + 
+    			"					<td width = \"15%\">Aircraft</td>\n" +
+    			"					<td>Airline Name</td>\n" + 
+    			"					<td>Departure<br><input name=\"orderDep\" type=submit value=\"asc\"/><input name=\"orderDep\" type=submit value=\"dsc\"/></td>\n" + 
+    			"					<td>Arrival<br><input name=\"orderArr\" type=submit value=\"asc\"/><input name=\"orderArr\" type=submit value=\"dsc\"/></td>\n" +
+    			"					<td>Coach Class<br><input name=\"orderPriCoach\" type=submit value=\"asc\"/><input name=\"orderPriCoach\" type=submit value=\"dsc\"/></td>\n" + 
+    			"					<td>Business Class<br><input name=\"orderPriBuss\" type=submit value=\"asc\"/><input name=\"orderPriBuss\" type=submit value=\"dsc\"/></td>\n" +
+    			"					<td>First Class<br><input name=\"orderPriFrst\" type=submit value=\"asc\"/><input name=\"orderPriFrst\" type=submit value=\"dsc\"/></td>\n" +
+    			"				</tr>\n" ;
+    			
+    	while(results.next()) {
+    		str += "<tr>\n"; 
+    		str += "<td>" + results.getString("FlightNumber") + "</td>\n";
+    		str += "<td>" + results.getString("Model") + "</td>\n";
+    		str += "<td>" + results.getString("AirlineName") + "</td>\n";
+    		str += "<td>" + results.getString("DepartureTime") + "</td>\n";
+    		str += "<td>" + results.getString("ArrivalTime") + "</td>\n";
+    		
+    		String checkedString = "";
+    		if (!selectionMade) {
+    			if (!selectedPrice.equals("")) {
+        			if (results.getString("PublishedEconomyPrice").equals(selectedPrice)) {
+        				selectionMade = true;
+        				checkedString = "checked";
+        			}
+    			}
+    		}
+    		
+    		str += "<td align=center> $" + results.getString("PublishedEconomyPrice") +  "<input type=\"radio\"  name=\"departSeat\" " + checkedString + " value=\"coach_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
+    		str += "<td align=center> $" + results.getString("PublishedBusinessPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"business_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
+    		str += "<td align=center> $" + results.getString("PublishedFirstPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"first_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
+    		str += "</tr>\n";
+    	}
+//		ResultSetMetaData rsmd = (ResultSetMetaData) aircraft.getMetaData();
+//		int columnCount = rsmd.getColumnCount();
+    	
+    	str +=  "			</tbody>\n" + 
+    			"		</table>\n" + 
+    			"	</div>\n" + 
+    			"	</form>\n" + 
+    			"<p>"+ error + "</p>"+
+    			"</body>\n" + 
+    			"</html>";
+    	out.write(str);
+    }
+	
 	
 
 	/**
@@ -452,21 +530,27 @@ public class FlightSearch extends HttpServlet {
 			if (request.getParameter("showFlex").equals("Show Flex Dates")) {
 				_isPostback = true;
 				_showFlexDates = true;
+				
 			} 
 			
 		} catch (Exception ex) {
 			
 		}
 		
+		
+		
+		
+		
+		
+		
 		try {
-			if (request.getParameter("showFlex").equals("Show Exact Dates")) {
-				_isPostback = true;
-				_showFlexDates = false;
-			} 
+			_selectedDays = request.getParameter("selectedDay");
 			
 		} catch (Exception ex) {
 			
 		}
+		
+		
 		
 		
 		
@@ -547,15 +631,15 @@ public class FlightSearch extends HttpServlet {
 		}
 		
 
-		try {
-			if (request.getParameter("orderPriBuss").equals("dsc")) {
-				_isPostback = true;
-				_orderBy = "order by FT.PublishedBusinessPrice DESC";
-			} 
-			
-		} catch (Exception ex) {
-			
-		}
+//		try {
+//			if (request.getParameter("orderPriBuss").equals("dsc")) {
+//				_isPostback = true;
+//				_orderBy = "order by FT.PublishedBusinessPrice DESC";
+//			} 
+//			
+//		} catch (Exception ex) {
+//			
+//		}
 		
 		
 		

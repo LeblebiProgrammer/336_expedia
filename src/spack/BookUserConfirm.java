@@ -364,6 +364,7 @@ public class BookUserConfirm extends HttpServlet {
 					stmt2.executeUpdate();
 					
 					con.close();
+					response.sendRedirect("Dashboard");
 				} catch (Exception e) {
 					System.out.println(e.getMessage());
 				}

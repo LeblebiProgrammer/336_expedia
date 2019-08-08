@@ -224,6 +224,7 @@ public class ManageUsers extends HttpServlet {
 			password = request.getParameter("password");
 			emailAddress = request.getParameter("email");
 			
+			String accountNumber = request.getParameter("accountType");
 			
 			boolean isCorrect = true;
 			
@@ -268,10 +269,11 @@ public class ManageUsers extends HttpServlet {
 					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 					PreparedStatement stmt=con.prepareStatement("Insert into UserTable (FirstName, LastName, Password, AccountType, EmailAddress) Values (?, ?, ?, ?, ?)");  
 	
+					int ac = Integer.parseInt(accountNumber);
 					stmt.setString(1, firstName);
 					stmt.setString(2, lastName);
 					stmt.setString(3, password);
-					stmt.setString(4, "3");
+					stmt.setInt(4, ac);
 					stmt.setString(5, emailAddress);
 					
 					stmt.executeUpdate();

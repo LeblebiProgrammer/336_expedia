@@ -62,16 +62,19 @@ public class Main extends HttpServlet {
 			
 			departureCityDropdown = "<select name = \"origin\" size = \"1\">" + 
 					"<option value = \"\">Select Depart City</option>\n";
-	    	do {
+
+			while(rsDepart.next()){
 	    		
 	    		try {
 	    			String option = "<option value = \"" + rsDepart.getString("DepartureCity") + "\">" + rsDepart.getString("DepartureCity") + "</option>\n";
 	    			departureCityDropdown += option;
 	    		}
 	    		catch(Exception e) {
-	    			System.out.print(e.getMessage());
+	    			System.out.print("Error On Depart city:" + e.getMessage());
 	    		}
-	    	}while(rsDepart.next());
+	    		//System.out.print("departCity ");
+	    	}
+	    	
 	    	departureCityDropdown += "</select>";
 	    	
 	    	
@@ -84,16 +87,23 @@ public class Main extends HttpServlet {
 			
 			returnCityDropdown = "<select name = \"destination\" size = \"1\">"+ 
 					"<option value = \"\">Select Arrival City</option>\n";
-	    	do {
+			
+			
+			while(rsReturn.next()) {
+	    	
 	    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
 	    		try {
 	    			String option = "<option value = \"" + rsReturn.getString("DestinationCity") + "\">" + rsReturn.getString("DestinationCity") + "</option>\n";
 	    			returnCityDropdown += option;
 	    		}
 	    		catch(Exception e) {
-	    			System.out.print(e.getMessage());
+	    			System.out.print("Error On Arrival city:" + e.getMessage());
 	    		}
-	    	}while(rsReturn.next());
+	    		
+	    		//System.out.print("returnCity ");
+	    	}
+	    	
+	    	
 	    	returnCityDropdown += "</select>";
 	    	
 	    	
@@ -101,7 +111,9 @@ public class Main extends HttpServlet {
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			//departureCityDropdown = "Error: " ;
+			
 			e.printStackTrace();
+			System.out.print("Db Read Error:" + e.getMessage());
 		}  
 		
 		
@@ -382,8 +394,7 @@ public class Main extends HttpServlet {
 					request.setAttribute("_fromDate", request.getAttribute("_fromDate"));
 					
 					
-					RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
-					dispatcher.forward(request, response);
+					
 					//response.setIntHeader("refresh", 0);
 			
 				}
@@ -391,6 +402,9 @@ public class Main extends HttpServlet {
 			catch(Exception e){
 				
 			}
+			
+			RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
+			dispatcher.forward(request, response);
 		}
 	}
 
