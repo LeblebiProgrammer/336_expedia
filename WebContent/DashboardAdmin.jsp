@@ -22,11 +22,11 @@
 				<tbody>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input
-							name="click" type="submit" value="Manage users" /></td>
+							name="click" type="submit" value="Manage Users" /></td>
 					</tr>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input
-							name="click" type="submit" value="Get Sales" /></td>
+							name="click" type="submit" value="Monthly Sales Report" /></td>
 					</tr>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input
@@ -38,7 +38,7 @@
 					</tr>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input
-							name="click" type="submit" value="Get Flight History" /></td>
+							name="click" type="submit" value="Most Active Flights" /></td>
 					</tr>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input

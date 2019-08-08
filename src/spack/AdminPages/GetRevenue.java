@@ -19,107 +19,33 @@ import com.mysql.jdbc.ResultSetMetaData;
 /**
  * Servlet implementation class ReservationByName
  */
-@WebServlet("/ReservationByName")
-public class ReservationByName extends HttpServlet {
+@WebServlet("/GetRevenue")
+public class GetRevenue extends HttpServlet implements NavigationBar{
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-	private String aic = "";
-	
-	private void setCode(String code) {
-		aic = code;
-	}
-	
-	private String getCode() {
-		return aic;
-	}
-     
-     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) {
+	private String searchby = null;
+	 
+     protected void initialHtml(java.io.PrintWriter out) {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
 	    			"<head>\n" + 
 	    			"<meta charset=\"UTF-8\">\n" + 
-	    			"<title>Reservation by name</title>\n" + 
+	    			"<title>Get Revenue</title>\n" + 
 	    			"</head>\n" + 
-	    			"<body>\n" + 
-	    			"	<form action=\"ReservationByName\" method=\"post\">\n" + 
-	    	 "			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-			"				<tbody>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"Manage users\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetSales\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetReservations\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetRevenue\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetFlightHistory\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetAllFlights\" /></td>\n" + 
-			"					</tr>\n" + 
-			"\n" + 
-			"				</tbody>\n" + 
-			"			</table></div>\n"+
-			
-	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-	"				<tbody>\n" + 
-	"					<tr style=\"height: 27px;\">\n" + 
-	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Search for airport</td>\n";
-	
-	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
-	    	
-	    	
-	    	
-	    	//departure
-	    	try {
-				while(airport.next()) {
-					//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
-					try {
-						if (airport.getString("AirportCode").equals(this.getCode())) {
-							String option = "<option value = \"" + airport.getString("AirportCode") + "\" selected>"
-									+ airport.getString("AirportName") + "</option>\n";
-							str += option;
-						} else {
-						String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
-						str += option;
-						}
-					}
-					catch(Exception e) {
-						System.out.print(e.getMessage());
-					}
-				}
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	    	str += "</select></td>";
-	
-	
-	
-	
-	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Search\" /></td>\n"+
-	"					</tr>\n" + 
-	"\n" + 
-	"				</tbody>\n" + 
-	"			</table></div>\n";
-			
-			;
-	    	
+	    			"<body>\n" + "<p align=center>Revenue Listing"; 
+	    			if(searchby != null) str += " By " + searchby;
+	    			str += "</p>" + 
+	    			navbarhtml 
+	    			+ "<form action=GetRevenue method=post>Generate According To:"
+	    			+ "</br> <input type=\"radio\" name=\"searchtype\" value=\"flight\" checked>Flight" 
+	    			+ "<input type=\"radio\" name=\"searchtype\" value=\"airline\">Airline"
+	    			+ "<input type=\"radio\" name=\"searchtype\" value=\"customer\">Customer"
+	    			+ "</br><input type=\"Submit\" name=\"searchtype\" value=\"Generate Revenue Listing\">"
+	    			+ "</form>";
 	    	out.print(str);
 	    }
       
@@ -157,30 +83,10 @@ public class ReservationByName extends HttpServlet {
 	}
   
   protected void finishHtml(java.io.PrintWriter out) {
-    	String str = "<div>\n" + 
-    			"		<br> <br> <br> <br>\n" + 
-    			"		<p>Add Airport</p>\n" + 
-    			"		<table border=\"2\">\n" + 
-    			"			<tbody>\n" + 
-    			"				<tr>\n" + 
-    			"					<td>Airline Name</td>\n" +		
-    			"				</tr>\n" + 
-    			"				<tr>\n" + 
-    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
-    			"				</tr>\n" + 
-    			"			</tbody>\n" + 
-    			"		</table>\n" + 
-    			"		\n" + 
-    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
-    			"	</div>\n" + 
-    			"	</form>\n" + 
-    			"<p>${error}</p>"+
-    			"</body>\n" + 
-    			"</html>";
-    	out.write(str);
+   
     }
 
-    public ReservationByName() {
+    public GetRevenue() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -191,21 +97,44 @@ public class ReservationByName extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// response.getWriter().append("Served at: ").append(request.getContextPath());
-    try {
+		try {
 			Class.forName("com.mysql.jdbc.Driver");  
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-			
+
 			PreparedStatement stmt;	
+			ResultSet rs;
+			initialHtml(response.getWriter());
 			
-			stmt=con.prepareStatement("select ut.FirstName, ut.LastName from UserTable ut where ut.FirstName = ? AND ut.LastName = ?");  
-			stmt.setString(1, this.getCode());
-			stmt.setString(2, getCode());
-			
-			ResultSet rs = stmt.executeQuery();
-			
-			initialHtml(response.getWriter(),rs);
-			makeTable(rs, response.getWriter());
+			if(searchby.equals("Flight"))
+			{
+				stmt = con.prepareStatement("select rft.FlightsID, ft.FlightNumber, SUM(rft.BookedPrice) as Revenue\n" + 
+						"from ReservationsFlightsTable rft\n" + 
+						"join FlightsTable ft using (FlightsID)\n" + 
+						"group by (FlightsID)");  
+				rs = stmt.executeQuery();
+				makeTable(rs, response.getWriter());
+			}
+			if(searchby.equals("Airline"))
+			{
+				stmt = con.prepareStatement("select fit.AirlineName, SUM(rft.BookedPrice) as Revenue\n" + 
+						"from ReservationsFlightsTable rft\n" + 
+						"join FlightsTable ft using (FlightsID)\n" + 
+						"join FlightInfoTable fit using (FlightNumber)\n" + 
+						"group by (AirlineName)");  
+				rs = stmt.executeQuery();
+				makeTable(rs, response.getWriter());
+			}
+			if(searchby.equals("Customer"))
+			{
+				stmt = con.prepareStatement("select rt.UserID, ut.FirstName, ut.LastName, rft.ReservationNumber, SUM(rft.BookedPrice) as Revenue\n" + 
+						"from ReservationsFlightsTable rft\n" + 
+						"join ReservationTable rt using (ReservationNumber)\n" + 
+						"join UserTable ut on (rt.UserID=ut.ID) \n" + 
+						"group by (UserID)");  
+				rs = stmt.executeQuery();
+				makeTable(rs, response.getWriter());
+			}
 
 			finishHtml(response.getWriter());
 			con.close();
@@ -220,94 +149,25 @@ public class ReservationByName extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-    String className = "ManageAirlines";
-		//navigation
-		if(request.getParameter("click").equals("BookUser")) {
-			response.sendRedirect("BookUser");
+		if(request.getParameter("searchtype").equals("flight")) {
+			searchby="Flight";
+			System.out.println("byflight");
+			response.sendRedirect("GetRevenue");
 			return;
 		}
-		if(request.getParameter("click").equals("ChangeFlight")) {
-			response.sendRedirect("ChangeFlight");
+		if(request.getParameter("searchtype").equals("airline")) {
+			searchby="Airline";
+			System.out.println("byairline");
+			response.sendRedirect("GetRevenue");
 			return;
 		}
-		if(request.getParameter("click").equals("ManageFlights")) {
-			response.sendRedirect("ManageFlights");
+		if(request.getParameter("searchtype").equals("customer")) {
+			searchby="Customer";
+			System.out.println("bycustomer");
+			response.sendRedirect("GetRevenue");
 			return;
 		}
-		if(request.getParameter("click").equals("ManageAirlines")) {
-			
-		}
-		if(request.getParameter("click").equals("ManageAirports")) {
-			response.sendRedirect("ManageAirports");
-			return;
-		}
-		if(request.getParameter("click").equals("ManageAirplanes")) {
-			response.sendRedirect("ManageAirplanes");
-			return;
-		}
-		if(request.getParameter("click").equals("GetWaitlist")) {
-			response.sendRedirect("GetWaitlist");
-		}
-		
-		
-		
-		
-		if(request.getParameter("click").equals("Add Airline")) {
-			String name = "";
-			
-			
-			String error = "";
-
-			
-			
-			if(request.getParameter("Name") != null) {
-				name = request.getParameter("Name");
-			}else {
-				error = "Airport name cannot be empty. ";
-			}
-			
-			if(error.length() > 0) {
-				
-			}
-			else {
-				try {
-					Class.forName("com.mysql.jdbc.Driver");  
-					Connection con=DriverManager.getConnection(  
-					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-					PreparedStatement stmt=con.prepareStatement("Insert into AirlineTable (Name) Values (?)");  
-				
-					//RequestDispatcher dispatcher;
-					stmt.setString(1, name);
-					
-					
-					int count = stmt.executeUpdate();
-					if(count > 0) {
-						System.out.println("Inserted");
-					}
-					con.close();
-				}catch(Exception e) {
-					System.out.println(e.getMessage());
-				}
-					
-			}
-			doGet(request, response);
-			return;
-		}
-		else {
-			String id = request.getParameter("click");
-			if(id != null) {
-				if(!id.equals(className)) {
-					//request.setAttribute("TailNumber", tailNumber);
-					RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirline");
-					request.setAttribute("_id", id);
-					dispatcher.forward( request, response);
-	//				response.sendRedirect("EditAirplane");
-					return;
-				}
-			}
-			
-		}
-		doGet(request, response);
+		//doGet(request, response);
 	}
 
 }

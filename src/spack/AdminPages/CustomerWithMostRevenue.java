@@ -105,16 +105,14 @@ public class CustomerWithMostRevenue extends HttpServlet implements NavigationBa
 			
 			PreparedStatement stmt;	
 			
-			stmt=con.prepareStatement("select t.UserID, t.FirstName, t.LastName, MAX(t.totalRevenue) as Revenue\n" + 
-					"from\n" + 
-					"(\n" + 
-					"	select rt.UserID, ut.FirstName, ut.LastName, SUM(BookedPrice) as totalRevenue\n" + 
-					"	from ReservationTable rt\n" + 
-					"	join ReservationsFlightsTable rft using (ReservationNumber)\n" + 
-					"    join UserTable ut on (rt.UserID = ut.ID)\n" + 
-					"	group by (UserID)) as t");  
-			
-			
+			stmt=con.prepareStatement("select UserID, ut.FirstName, ut.LastName, SUM(BookedPrice) as totalRevenue\n" + 
+					"from ReservationTable rt\n" + 
+					"join ReservationsFlightsTable rft using (ReservationNumber)\n" + 
+					"join UserTable ut on (rt.UserID = ut.ID)\n" + 
+					"group by (UserID)\n" + 
+					"order by totalRevenue DESC\n" + 
+					"limit 1");  
+
 			ResultSet rs = stmt.executeQuery();
 			
 			initialHtml(response.getWriter(), rs);

@@ -46,12 +46,14 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	    			"<body>\n" + "<p align=center>Get All Flights</p>" +
 	    			navbarhtml +
 			
-	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
+	"				<form action=\"AllFlightsGivenAirport\" method=post>\r\n"  + 
+	"				<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
 	"				<tbody>\n" + 
 	"					<tr style=\"height: 27px;\">\n" + 
 	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Flights For Airport: </td>\n";
 	
 	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
+	    	//str += "<form action=\"AllFlightsGivenAirport\" method=post>";
 	    	
 	    	
 	    	
@@ -77,13 +79,11 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	
 	
 	
-	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Submit\" /></td>\n"+
+	str += "<td>	<input name=\"click\" type=\"Submit\" value=\"Submit\" /></td>\n"+
 	"					</tr>\n" + 
 	"\n" + 
 	"				</tbody>\n" + 
-	"			</table></div>\n";
-			
-			;
+	"			</table></form></div>\n";
 	    	
 	    	out.print(str);
 	    }
@@ -91,7 +91,6 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
       private int makeTable(java.sql.ResultSet rs, java.io.PrintWriter out)
     	    throws Exception {
 		 int rowCount = 0;
-		
 		 out.println("<P ALIGN='center'><TABLE BORDER=1>");
 		 ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
 		 int columnCount = rsmd.getColumnCount();

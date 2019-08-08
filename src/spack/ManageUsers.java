@@ -16,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
+import spack.AdminPages.NavigationBar;
+
 /**
  * Servlet implementation class ManageUsers
  */
 @WebServlet("/ManageUsers")
-public class ManageUsers extends HttpServlet {
+public class ManageUsers extends HttpServlet implements NavigationBar {
 	private static final long serialVersionUID = 1L;
        
     /**
@@ -40,37 +42,7 @@ public class ManageUsers extends HttpServlet {
     			"<title>Manage Users</title>\n" + 
     			"</head>\n" + 
     			"<body>\n" + 
-    			"	<form action=\"ManageUsers\" method=\"post\">\n" + 
-    	 
-    	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-    	"				<tbody>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"Manage users\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"GetSales\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"GetReservations\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"GetRevenue\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"GetFlightHistory\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"					<tr style=\"height: 27px;\">\n" + 
-    	"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-    	"							name=\"click\" type=\"submit\" value=\"GetallFlights\" /></td>\n" + 
-    	"					</tr>\n" + 
-    	"\n" + 
-    	"				</tbody>\n" + 
-    	"			</table></div>\n" ;
+    			navbarhtml ;
     	
     	out.print(str);
     }
