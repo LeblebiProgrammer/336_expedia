@@ -27,7 +27,7 @@ public class RevenueByFlight extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
      
-     protected void initialHtml(java.io.PrintWriter out) {
+     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
@@ -185,12 +185,12 @@ public class RevenueByFlight extends HttpServlet {
 			
 			PreparedStatement stmt;	
 			
-			stmt=con.prepareStatement("select ft.FlightNumber, sum(rft.BookedPrice) from FlightsTable ft join ReservationFlightsTable rft using (FlightNumber) group by ft.FlightNumber");  
+			stmt=con.prepareStatement("select ft.FlightNumber, sum(rft.BookedPrice) from FlightsTable ft join ReservationsFlightsTable rft using (FlightsID) group by ft.FlightNumber");  
 			
 			
 			ResultSet rs = stmt.executeQuery();
 			
-			initialHtml(response.getWriter());
+			initialHtml(response.getWriter(),rs);
 			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());

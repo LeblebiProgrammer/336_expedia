@@ -33,7 +33,7 @@ public class AllFlightsGivenAirport extends HttpServlet {
 	}
 	
 	private String getCode() {
-		return aic;
+		return aic;}
 		
     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) throws SQLException {
 	    	String str = "\n" + 

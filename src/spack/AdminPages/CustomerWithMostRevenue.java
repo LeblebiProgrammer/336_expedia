@@ -198,7 +198,7 @@ public class CustomerWithMostRevenue extends HttpServlet {
 			
 			ResultSet rs = stmt.executeQuery();
 			
-			initialHtml(response.getWriter());
+			initialHtml(response.getWriter(), rs);
 			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());

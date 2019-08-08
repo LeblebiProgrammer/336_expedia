@@ -36,7 +36,7 @@ public class MonthlyRevenue extends HttpServlet {
 		return aic;
 	}
      
-     protected void initialHtml(java.io.PrintWriter out) {
+     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
@@ -87,22 +87,27 @@ public class MonthlyRevenue extends HttpServlet {
 	    	
 	    	
 	    	//departure
-	    	while(airport.next()) {
-	    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
-	    		try {
-	    			if (airport.getString("AirportCode").equals(this.getCode())) {
-						String option = "<option value = \"" + airport.getString("AirportCode") + "\" selected>"
-								+ airport.getString("AirportName") + "</option>\n";
+	    	try {
+				while(airport.next()) {
+					//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+					try {
+						if (airport.getString("AirportCode").equals(this.getCode())) {
+							String option = "<option value = \"" + airport.getString("AirportCode") + "\" selected>"
+									+ airport.getString("AirportName") + "</option>\n";
+							str += option;
+						} else {
+						String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
 						str += option;
-					} else {
-	    			String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
-	    			str += option;
+						}
 					}
-	    		}
-	    		catch(Exception e) {
-	    			System.out.print(e.getMessage());
-	    		}
-	    	}
+					catch(Exception e) {
+						System.out.print(e.getMessage());
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    	str += "</select></td>";
 	
 	
@@ -199,7 +204,7 @@ public class MonthlyRevenue extends HttpServlet {
 			
 			ResultSet rs = stmt.executeQuery();
 			
-			initialHtml(response.getWriter());
+			initialHtml(response.getWriter(),rs);
 			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());
