@@ -17,7 +17,7 @@
 		</table>
 	</div>
 	<div>
-		<form action="Dashboard" method=post>
+		<form action="DashboardAdmin" method=post>
 			<table style="height: 51px; width: 100px; float: left;" border="1">
 				<tbody>
 					<tr style="height: 27px;">
@@ -42,7 +42,11 @@
 					</tr>
 					<tr style="height: 27px;">
 						<td style="width: 260px; height: 27px; text-align: center;"><input
-							name="click" type="submit" value="Get all Flights" /></td>
+							name="click" type="submit"  value="Get all Flights" /></td>
+					</tr>
+					<tr style="height: 27px;">
+						<td style="width: 260px; height: 27px; text-align: center;"><input
+							name="click" type="submit" value="Customer - Most Revenue" /></td>
 					</tr>
 
 				</tbody>
