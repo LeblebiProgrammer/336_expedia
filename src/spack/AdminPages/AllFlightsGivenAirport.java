@@ -45,14 +45,15 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	    			"</head>\n" + 
 	    			"<body>\n" + "<p align=center>Get All Flights</p>" +
 	    			navbarhtml +
-	    			 "	<form action=\"AllFlightsGivenAirport\" method=\"post\">\n" +
 			
-	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
+	"				<form action=\"AllFlightsGivenAirport\" method=post>\r\n"  + 
+	"				<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
 	"				<tbody>\n" + 
 	"					<tr style=\"height: 27px;\">\n" + 
 	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Flights For Airport: </td>\n";
 	
 	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
+	    	//str += "<form action=\"AllFlightsGivenAirport\" method=post>";
 	    	
 	    	
 	    	
@@ -78,13 +79,11 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	
 	
 	
-	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Submit\" /></td>\n"+
+	str += "<td>	<input name=\"click\" type=\"Submit\" value=\"Submit\" /></td>\n"+
 	"					</tr>\n" + 
 	"\n" + 
 	"				</tbody>\n" + 
-	"			</table></div>\n";
-			
-			;
+	"			</table></form></div>\n";
 	    	
 	    	out.print(str);
 	    }
@@ -92,7 +91,6 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
       private int makeTable(java.sql.ResultSet rs, java.io.PrintWriter out)
     	    throws Exception {
 		 int rowCount = 0;
-		
 		 out.println("<P ALIGN='center'><TABLE BORDER=1>");
 		 ResultSetMetaData rsmd = (ResultSetMetaData) rs.getMetaData();
 		 int columnCount = rsmd.getColumnCount();
@@ -123,27 +121,27 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	}
   
   protected void finishHtml(java.io.PrintWriter out) {
-    	String str = //"<div>\n" + 
-//    			"		<br> <br> <br> <br>\n" + 
-//    			"		<p>Add Airport</p>\n" + 
-//    			"		<table border=\"2\">\n" + 
-//    			"			<tbody>\n" + 
-//    			"				<tr>\n" + 
-//    			"					<td>Airline Name</td>\n" +		
-//    			"				</tr>\n" + 
-//    			"				<tr>\n" + 
-//    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
-//    			"				</tr>\n" + 
-//    			"			</tbody>\n" + 
-//    			"		</table>\n" + 
-//    			"		\n" + 
-//    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
-//    			"	</div>\n" + 
+    	/*String str = "<div>\n" + 
+    			"		<br> <br> <br> <br>\n" + 
+    			"		<p>Add Airport</p>\n" + 
+    			"		<table border=\"2\">\n" + 
+    			"			<tbody>\n" + 
+    			"				<tr>\n" + 
+    			"					<td>Airline Name</td>\n" +		
+    			"				</tr>\n" + 
+    			"				<tr>\n" + 
+    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
+    			"				</tr>\n" + 
+    			"			</tbody>\n" + 
+    			"		</table>\n" + 
+    			"		\n" + 
+    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
+    			"	</div>\n" + 
     			"	</form>\n" + 
-    			//"<p>${error}</p>"+
+    			"<p>${error}</p>"+
     			"</body>\n" + 
     			"</html>";
-    	out.write(str);
+    	out.write(str);*/
     }
 
     public AllFlightsGivenAirport() {

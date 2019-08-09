@@ -17,31 +17,24 @@ public class DashboardAdmin extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		//navigation
-		if(request.getParameter("click").equals("BookUser")) {
-			response.sendRedirect("BookUser");
+		if(request.getParameter("click").equals("Manage Users")) {
+			response.sendRedirect("ManageUsers");
 			return;
 		}
-		if(request.getParameter("click").equals("ChangeFlight")) {
-			response.sendRedirect("ChangeFlight");
+		if(request.getParameter("click").equals("Monthly Sales Report")) {
+			response.sendRedirect("MonthlySalesReport");
 			return;
 		}
-		if(request.getParameter("click").equals("ManageFlights")) {
-			response.sendRedirect("ManageFlights");
+		if(request.getParameter("click").equals("Get Reservations")) {
+			response.sendRedirect("Reservations");
 			return;
 		}
-		if(request.getParameter("click").equals("ManageAirlines")) {
-			
-		}
-		if(request.getParameter("click").equals("ManageAirports")) {
-			response.sendRedirect("ManageAirports");
+		if(request.getParameter("click").equals("Get Revenue")) {
+			response.sendRedirect("GetRevenue");
 			return;
 		}
-		if(request.getParameter("click").equals("ManageAirplanes")) {
-			response.sendRedirect("ManageAirplanes");
-			return;
-		}
-		if(request.getParameter("click").equals("GetWaitlist")) {
-			response.sendRedirect("GetWaitlist");
+		if(request.getParameter("click").equals("Most Active Flights")) {
+			response.sendRedirect("MostActiveFlights");
 			return;
 		}
 		if(request.getParameter("click").equals("Get all Flights")) {

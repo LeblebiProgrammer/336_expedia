@@ -6,11 +6,11 @@ public interface NavigationBar {
 			"				<tbody>\r\n" + 
 			"					<tr style=\"height: 27px;\">\r\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\r\n" + 
-			"							name=\"click\" type=\"submit\" value=\"Manage users\" /></td>\r\n" + 
+			"							name=\"click\" type=\"submit\" value=\"Manage Users\" /></td>\r\n" + 
 			"					</tr>\r\n" + 
 			"					<tr style=\"height: 27px;\">\r\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\r\n" + 
-			"							name=\"click\" type=\"submit\" value=\"Get Sales\" /></td>\r\n" + 
+			"							name=\"click\" type=\"submit\" value=\"Monthly Sales Report\" /></td>\r\n" + 
 			"					</tr>\r\n" + 
 			"					<tr style=\"height: 27px;\">\r\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\r\n" + 
@@ -22,7 +22,7 @@ public interface NavigationBar {
 			"					</tr>\r\n" + 
 			"					<tr style=\"height: 27px;\">\r\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\r\n" + 
-			"							name=\"click\" type=\"submit\" value=\"Get Flight History\" /></td>\r\n" + 
+			"							name=\"click\" type=\"submit\" value=\"Most Active Flights\" /></td>\r\n" + 
 			"					</tr>\r\n" + 
 			"					<tr style=\"height: 27px;\">\r\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\r\n" + 
