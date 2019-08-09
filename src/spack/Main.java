@@ -214,9 +214,9 @@ public class Main extends HttpServlet {
 		if(request.getParameter("click").equals("log out")) {
 			request.setAttribute("value", "");
 			session.removeAttribute("username");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
-			dispatcher.forward( request, response);
-			return;
+//			RequestDispatcher dispatcher = request.getRequestDispatcher("Main");
+//			dispatcher.forward( request, response);
+//			return;
 		}
 		//signup
 		else if(request.getParameter("click").equals("signup")) {
@@ -363,6 +363,8 @@ public class Main extends HttpServlet {
 				//session.setAttribute("search", _so);
 				
 				
+				
+				
 				RequestDispatcher dispatcher = request.getRequestDispatcher("FlightSearch");
 				dispatcher.forward(request, response);
 				
@@ -406,6 +408,8 @@ public class Main extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher("Main.jsp");
 			dispatcher.forward(request, response);
 		}
+		
+		doGet(request, response);
 	}
 
 }

@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -189,7 +188,7 @@ public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-    String className = "ManageAirlines";
+
 		//navigation
 		if(request.getParameter("click").equals("BookUser")) {
 			response.sendRedirect("BookUser");

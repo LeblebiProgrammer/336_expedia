@@ -16,11 +16,13 @@ import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Locale;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
@@ -35,7 +37,7 @@ public class FlightSearch extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
 	
-	private String error;
+	private String error = "";
 	
 	private String _departDateCache = "";
 	private String _returnDateCache = "";
@@ -66,7 +68,7 @@ public class FlightSearch extends HttpServlet {
     			"</head>\n" + 
     			"<body>\n" + 
     			"	<form action=\"FlightSearch\" method=\"post\">\n" +
-    			"		<p><a href=\"Main\">&lt;Back</a>\n<br/><br/><br/>";
+    			"		<p><a href=\"Main\">&lt;Back</a>\n<br/>";
     	
     	
     	if (_showFlexDates) {
@@ -90,7 +92,16 @@ public class FlightSearch extends HttpServlet {
     }
   
 	
-    
+	protected void formEnd(java.io.PrintWriter out) {
+		
+		String str = "	</form>\n" + 
+		    			"<p>"+ error + "</p>"+
+		    			"</body>\n" + 
+		    			"</html>";
+		
+		out.write(str);
+		
+	}
 	
 	
     private int getWeekDay(String _dateEntered) {
@@ -162,13 +173,34 @@ public class FlightSearch extends HttpServlet {
 				_selectFlexDate = false;
 			}
 			
+			boolean isLoggedIn = false;
+			
+			try {
+				HttpSession _session = request.getSession();
+				
+				User _user = (User) _session.getAttribute("username");
+				if(_user != null) {
+
+					isLoggedIn = true;
+				}
+				else {
+					isLoggedIn = false;
+				}
+				
+			}
+			catch(Exception e){
+				
+			}
+			
+			
+			
 			if (_showFlexDates) {
 				RunFlexSearchResult(con, response);
 			} else if (_selectFlexDate) {
 				
-				RunSearchResult(con, response, _selectedDays); 
+				RunSearchResult(con, response, _selectedDays, isLoggedIn); 
 			} else {  
-				RunSearchResult(con, response, "");
+				RunSearchResult(con, response, "", isLoggedIn);
 			}
 			
 			
@@ -253,7 +285,7 @@ public class FlightSearch extends HttpServlet {
 				    date = dateFormat.parse(_departDateCache);
 				    Calendar calendar = Calendar.getInstance();
 			        calendar.setTime(date);
-			        calendar.add(Calendar.DAY_OF_MONTH, i-1);
+			        calendar.add(Calendar.DAY_OF_MONTH, (i -2));
 			        departDates[iDate] = dateFormatOut.format(calendar.getTime());  
 
 				    
@@ -276,7 +308,7 @@ public class FlightSearch extends HttpServlet {
 				    date = dateFormat.parse(_returnDateCache);
 				    Calendar calendar = Calendar.getInstance();
 			        calendar.setTime(date);
-			        calendar.add(Calendar.DAY_OF_MONTH, i-1);
+			        calendar.add(Calendar.DAY_OF_MONTH, (i - 2));
 			        returnDates[iDate] = dateFormatOut.format(calendar.getTime());  
 				    
 				} 
@@ -319,7 +351,12 @@ public class FlightSearch extends HttpServlet {
     					SelectedDay = "checked";
     				}
     				if (FlightTotal > 0) {
-    						str += "<td width = \"100\" align=center> "  + "<input type=\"radio\"  name=\"selectedDay\" " + SelectedDay + " value=\""  + departDates[iY] +  "," + departNumbers[iY] + "|" + returnDates[iX] + "," + returnNumbers[iX] + "\"/> $" +  dayTotal + "</td>\n" ;	
+    						str += "<td width = \"100\" align=center> "  + "<input type=\"radio\"  name=\"selectedDay\" " + SelectedDay + " value=\""  + departDates[iY] +  "," + departNumbers[iY] + "|" + returnDates[iX] + "," + returnNumbers[iX] + "\"/> $" ;
+    						str +=	dayTotal;
+//    						if (true) {
+//    							str += "<br/>" + departDates[iY] +  "," + departNumbers[iY] + "<br/>" + returnDates[iX] + "," + returnNumbers[iX] + " "; 
+//    						}
+    						str += "</td>\n" ;	
     				} else {
     						str += "<td width = \"100\" align=center> "  + " N/A</td>\n" ;
     				}
@@ -334,7 +371,7 @@ public class FlightSearch extends HttpServlet {
 		str += "<input name=\"selectFlex\" type=submit value=\"Select Flight\"/> ";
 		response.getWriter().print(str);
 			
-			
+		formEnd(response.getWriter());
 			
 
 			con.close();
@@ -351,10 +388,14 @@ public class FlightSearch extends HttpServlet {
 	
 	
 	
-	private void RunSearchResult(Connection con, HttpServletResponse response, String selectedDays) {
+	private void RunSearchResult(Connection con, HttpServletResponse response, String selectedDays, boolean loggedIn) {
 		
 		
 		try {
+			
+			
+			initialHtml(response.getWriter());
+			
 			int departWeekDay = getWeekDay(_departDateCache);
 			int returnWeekDay = getWeekDay(_returnDateCache);
 			String departSelect = "";
@@ -406,7 +447,7 @@ public class FlightSearch extends HttpServlet {
 			}
 			
 			
-			initialHtml(response.getWriter());
+			
 			
 			String _error = "";
 			
@@ -426,7 +467,7 @@ public class FlightSearch extends HttpServlet {
 					"        WHERE FT.Day = " + departWeekDay + " AND FIT.DepartureCity = '" + _departCityCache + "' AND FIT.DestinationCity = '" + _returnCityCache + "' \n" +
 					_orderBy;
 			
-			System.out.print("SQL1:" + departSQL);
+			//System.out.print("SQL1:" + departSQL);
 			
 			PreparedStatement departStmt = con.prepareStatement(departSQL);
 			ResultSet rsDepart = departStmt.executeQuery();
@@ -443,7 +484,7 @@ public class FlightSearch extends HttpServlet {
 						"        WHERE FT.Day = " + returnWeekDay + " AND FIT.DepartureCity = '" + _returnCityCache + "' AND FIT.DestinationCity = '" + _departCityCache + "'\n" + 
 						_orderBy;
 
-				System.out.print("SQL2:" + departSQL);
+				//System.out.print("SQL2:" + departSQL);
 				
 				PreparedStatement returnStmt = con.prepareStatement(returnSQL);
 				ResultSet rsReturn = returnStmt.executeQuery();
@@ -451,14 +492,26 @@ public class FlightSearch extends HttpServlet {
 				
 			}
 			
-
+			if (loggedIn) {
+			
+				response.getWriter().write("<input name=\"selectFlights\" type=submit value=\"Reserve Flight\"/> ");
+			} else {
+				response.getWriter().write("<b>Please login to reserve selected flight!</b>");
+			}
+			//str += "<input name=\"showFlex\" type=submit value=\"Show Flex Dates\"/> ";	
+			
+			
 			con.close();
+			formEnd(response.getWriter());
+			
 		} catch (Exception ex) {
 			
 		}
 		
 		
+		
 	}
+	
 	
 	
 	protected void displayResult(String Caption, String FlightDate, String FlightFrom, String FlightTo, java.io.PrintWriter out, ResultSet results, String segmentType, String error, String selectedPrice) throws SQLException {
@@ -466,20 +519,32 @@ public class FlightSearch extends HttpServlet {
 		
 		boolean selectionMade = false; 
 		String str = "<div>\n" + 
-    			"		<br> <br> <br> <br>\n" + 
+    			"		<br> \n" + 
     			"		<p>" + Caption + " " + FlightDate + " From:" + FlightFrom + " To:" + FlightTo +  "</p>\n" + 
     			"		<table border=\"2\">\n" + 
     			"			<tbody>\n" + 
     			"				<tr>\n" + 
-    			"					<td>Flight Number</td>\n" + 
-    			"					<td width = \"15%\">Aircraft</td>\n" +
-    			"					<td>Airline Name</td>\n" + 
-    			"					<td>Departure<br><input name=\"orderDep\" type=submit value=\"asc\"/><input name=\"orderDep\" type=submit value=\"dsc\"/></td>\n" + 
-    			"					<td>Arrival<br><input name=\"orderArr\" type=submit value=\"asc\"/><input name=\"orderArr\" type=submit value=\"dsc\"/></td>\n" +
-    			"					<td>Coach Class<br><input name=\"orderPriCoach\" type=submit value=\"asc\"/><input name=\"orderPriCoach\" type=submit value=\"dsc\"/></td>\n" + 
-    			"					<td>Business Class<br><input name=\"orderPriBuss\" type=submit value=\"asc\"/><input name=\"orderPriBuss\" type=submit value=\"dsc\"/></td>\n" +
-    			"					<td>First Class<br><input name=\"orderPriFrst\" type=submit value=\"asc\"/><input name=\"orderPriFrst\" type=submit value=\"dsc\"/></td>\n" +
-    			"				</tr>\n" ;
+    			"					<td width=100 align=center><b>Flight Number</b></td>\n" + 
+    			"					<td width=100 align=center><b>Aircraft</b></td>\n" +
+    			"					<td width=200 align=center><b>Airline Name</b></td>\n" ;
+    			
+    	if (segmentType.equals("depart")) {
+    		str += "					<td width=100 align=center><b>Departure<br><input name=\"orderDep\" type=submit value=\"asc\"/><input name=\"orderDep\" type=submit value=\"dsc\"/></b></td>\n" + 
+        			"					<td width=100 align=centet><b>Arrival<br><input name=\"orderArr\" type=submit value=\"asc\"/><input name=\"orderArr\" type=submit value=\"dsc\"/></b></td>\n" +
+        			"					<td width=100 align=center><b>Coach Class<br><input name=\"orderPriCoach\" type=submit value=\"asc\"/><input name=\"orderPriCoach\" type=submit value=\"dsc\"/></b></td>\n" + 
+        			"					<td width=100 align=center><b>Business Class<br><input name=\"orderPriBuss\" type=submit value=\"asc\"/><input name=\"orderPriBuss\" type=submit value=\"dsc\"/></b></td>\n" +
+        			"					<td width=100 align=center><b>First Class<br><input name=\"orderPriFrst\" type=submit value=\"asc\"/><input name=\"orderPriFrst\" type=submit value=\"dsc\"/></b></td>\n" +
+        			"				</tr>\n" ;
+    	} else {
+    		str += "					<td width=100 align=center><b>Departure</b></td>\n" + 
+        			"					<td width=100 align=center><b>Arrival<b></td>\n" +
+        			"					<td width=100 align=center><b>Coach Class<b></td>\n" + 
+        			"					<td width=100 align=center><b>Business Class<b></td>\n" +
+        			"					<td width=100 align=center><b>First Class<b></td>\n" +
+        			"				</tr>\n" ;
+    	}
+    			
+		
     			
     	while(results.next()) {
     		str += "<tr>\n"; 
@@ -496,12 +561,20 @@ public class FlightSearch extends HttpServlet {
         				selectionMade = true;
         				checkedString = "checked";
         			}
+    			} else {
+//    				selectionMade = true;
+//    				checkedString = "checked";
     			}
     		}
     		
-    		str += "<td align=center> $" + results.getString("PublishedEconomyPrice") +  "<input type=\"radio\"  name=\"departSeat\" " + checkedString + " value=\"coach_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
-    		str += "<td align=center> $" + results.getString("PublishedBusinessPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"business_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
-    		str += "<td align=center> $" + results.getString("PublishedFirstPrice") + "<input type=\"radio\"  name=\"departSeat\" value=\"first_" + segmentType + "_" + results.getString("FlightNumber")   +  "\"></td>\n";
+    		String coachCost =  results.getString("PublishedEconomyPrice");
+    		String businessCost =  results.getString("PublishedBusinessPrice");
+    		String firstCost =  results.getString("PublishedFirstPrice");
+    		
+    		
+    		str += "<td align=right> $" + coachCost +  "&nbsp;<input type=\"radio\"  name=\"" + segmentType  + "_seat\" " + checkedString + " value=\"coach_" + segmentType + "_" + results.getString("FlightNumber") + "_" + FlightDate + "_" + coachCost + "\"></td>\n";
+    		str += "<td align=right> $" + businessCost + "&nbsp;<input type=\"radio\"  name=\"" + segmentType  + "_seat\" value=\"business_" + segmentType + "_" + results.getString("FlightNumber")  + "_" + FlightDate + "_" + businessCost + "\"></td>\n";
+    		str += "<td align=right> $" + firstCost + "&nbsp;<input type=\"radio\"  name=\"" + segmentType  + "_seat\" value=\"first_" + segmentType + "_" + results.getString("FlightNumber")  + "_" + FlightDate + "_" + firstCost + "\"></td>\n";
     		str += "</tr>\n";
     	}
 //		ResultSetMetaData rsmd = (ResultSetMetaData) aircraft.getMetaData();
@@ -509,11 +582,8 @@ public class FlightSearch extends HttpServlet {
     	
     	str +=  "			</tbody>\n" + 
     			"		</table>\n" + 
-    			"	</div>\n" + 
-    			"	</form>\n" + 
-    			"<p>"+ error + "</p>"+
-    			"</body>\n" + 
-    			"</html>";
+    			"</div>";			
+    			
     	out.write(str);
     }
 	
@@ -629,6 +699,24 @@ public class FlightSearch extends HttpServlet {
 		} catch (Exception ex) {
 			
 		}
+		
+		
+		
+		try {
+			
+			
+			if (request.getParameter("selectFlights").equals("Reserve Flight")) {
+				
+				
+				RequestDispatcher dispatcher = request.getRequestDispatcher("FlightReserv");
+				dispatcher.forward(request, response);
+			} 
+			
+		} catch (Exception ex) {
+			
+		}
+		//("<input name=\"selectFlights\" type=submit value=\"Select Flight\"/> ");
+		
 		
 
 //		try {

@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,15 +25,15 @@ public class CustomerWithMostRevenue extends HttpServlet implements NavigationBa
     /**
      * @see HttpServlet#HttpServlet()
      */
-	private String aic = "";
-	
-	private void setCode(String code) {
-		aic = code;
-	}
-	
-	private String getCode() {
-		return aic;
-	}
+//	private String aic = "";
+//	
+//	private void setCode(String code) {
+//		aic = code;
+//	}
+//	
+//	private String getCode() {
+//		return aic;
+//	}
      
       protected void initialHtml(java.io.PrintWriter out, ResultSet airport) throws SQLException {
 	    	String str = "\n" + 
@@ -131,7 +130,7 @@ public class CustomerWithMostRevenue extends HttpServlet implements NavigationBa
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-    String className = "ManageAirlines";
+    
 		//navigation
 		if(request.getParameter("click").equals("BookUser")) {
 			response.sendRedirect("BookUser");
