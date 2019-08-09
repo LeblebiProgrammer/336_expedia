@@ -57,7 +57,7 @@ public class MonthlySalesReport extends HttpServlet implements NavigationBar{
 	    			"<option value=\"12\">Dec</option>" +
 	    			"</select>" +
  	    			"Year:<input type=\"number\" name=\"year\" min=\"0\" max=\"2019\" required>" +
-	    			"</br><input type=\"submit\" name=\"click\" value=\"Generate Report\"" +
+	    			"</br><input type=\"submit\" name=\"click\" value=\"Generate Report\">" +
 	    			"</form>";
 
 	    	out.print(str);
@@ -149,6 +149,7 @@ public class MonthlySalesReport extends HttpServlet implements NavigationBar{
 		// TODO Auto-generated method stub
 		String searchmonth = request.getParameter("month");
 		String searchyear = request.getParameter("year");
+		System.out.println("search on " + searchmonth + searchyear);
 		if(searchmonth != null && searchyear != null)
 		{
 			month = Integer.parseInt(searchmonth);
