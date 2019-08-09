@@ -87,9 +87,9 @@ public class LogIn extends HttpServlet {
 
 			if (isCorrect == false) {
 
-				RequestDispatcher dispatcher = request.getRequestDispatcher("Login.jsp");
-				dispatcher.forward(request, response);
-				return;
+//				RequestDispatcher dispatcher = request.getRequestDispatcher("Login.jsp");
+//				dispatcher.forward(request, response);
+//				return;
 			}
 
 			try {
@@ -125,7 +125,7 @@ public class LogIn extends HttpServlet {
 					return;
 
 				} else {
-					response.getWriter().print("no user name password found");
+					//response.getWriter().print("no user name password found");
 				}
 
 				//
