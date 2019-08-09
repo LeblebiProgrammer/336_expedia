@@ -27,49 +27,85 @@ public class RevenueByFlight extends HttpServlet {
      * @see HttpServlet#HttpServlet()
      */
      
-     protected void initialHtml(java.io.PrintWriter out) {
+     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
 	    			"<head>\n" + 
 	    			"<meta charset=\"UTF-8\">\n" + 
-	    			"<title>Manage Airlines</title>\n" + 
+	    			"<title>Amount of sale by flight</title>\n" + 
 	    			"</head>\n" + 
 	    			"<body>\n" + 
-	    			"	<form action=\"ManageAirlines\" method=\"post\">\n" + 
+	    			"	<form action=\"RevenueByFlight\" method=\"post\">\n" + 
 	    	 
 	    	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-	    	"				<tbody>\n" + 
-	    	"<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"BookUser\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ChangeFlight\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageFlights\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirports\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirlines\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirplanes\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"GetWaitlist\" /></td>\n" + 
-	    	"				</tr>"+
-	    	"				</tbody>\n" + 
-	    	"			</table></div>\n" ;
+			"				<tbody>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"Manage users\" /></td>\n" + 
+			"					</tr>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"GetSales\" /></td>\n" + 
+			"					</tr>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"GetReservations\" /></td>\n" + 
+			"					</tr>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"GetRevenue\" /></td>\n" + 
+			"					</tr>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"GetFlightHistory\" /></td>\n" + 
+			"					</tr>\n" + 
+			"					<tr style=\"height: 27px;\">\n" + 
+			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
+			"							name=\"click\" type=\"submit\" value=\"GetAllFlights\" /></td>\n" + 
+			"					</tr>\n" + 
+			"\n" + 
+			"				</tbody>\n" + 
+			"			</table></div>\n"+
+			
+	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
+	"				<tbody>\n" + 
+	"					<tr style=\"height: 27px;\">\n" + 
+	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Search for airport</td>\n";
+	
+	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
+	    	
+	    	
+	    	
+	    	//departure
+//	    	while(airport.next()) {
+//	    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+//	    		try {
+//	    			if (airport.getString("AirportCode").equals(this.getCode())) {
+//						String option = "<option value = \"" + airport.getString("AirportCode") + "\" selected>"
+//								+ airport.getString("AirportName") + "</option>\n";
+//						str += option;
+//					} else {
+//	    			String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
+//	    			str += option;
+//					}
+//	    		}
+//	    		catch(Exception e) {
+//	    			System.out.print(e.getMessage());
+//	    		}
+//	    	}
+//	    	str += "</select></td>";
+	
+	
+	
+	
+	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Search\" /></td>\n"+
+	"					</tr>\n" + 
+	"\n" + 
+	"				</tbody>\n" + 
+	"			</table></div>\n";
+			
+			;
 	    	
 	    	out.print(str);
 	    }
@@ -149,12 +185,12 @@ public class RevenueByFlight extends HttpServlet {
 			
 			PreparedStatement stmt;	
 			
-			stmt=con.prepareStatement("select FlightID, sum(BookedPrice) from ReservationTable group by AirlineID");  
+			stmt=con.prepareStatement("select ft.FlightNumber, sum(rft.BookedPrice) from FlightsTable ft join ReservationsFlightsTable rft using (FlightsID) group by ft.FlightNumber");  
 			
 			
 			ResultSet rs = stmt.executeQuery();
 			
-			initialHtml(response.getWriter());
+			initialHtml(response.getWriter(),rs);
 			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());

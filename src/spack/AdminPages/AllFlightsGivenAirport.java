@@ -16,29 +16,26 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
-
 /**
  * Servlet implementation class AllFlightsGivenAirport
  */
 @WebServlet("/AllFlightsGivenAirport")
-public class AllFlightsGivenAirport extends HttpServlet {
+public class AllFlightsGivenAirport extends HttpServlet implements NavigationBar {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-	
-	private String aic = "";
+     private String aic = "";
 	
 	private void setCode(String code) {
 		aic = code;
 	}
 	
 	private String getCode() {
-		return aic;
-	}
-     
-     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) throws SQLException {
+		return aic;}
+		
+    protected void initialHtml(java.io.PrintWriter out, ResultSet airport) throws SQLException {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
@@ -46,43 +43,14 @@ public class AllFlightsGivenAirport extends HttpServlet {
 	    			"<meta charset=\"UTF-8\">\n" + 
 	    			"<title>All flights for airport</title>\n" + 
 	    			"</head>\n" + 
-	    			"<body>\n" + 
-	    			"	<form action=\"AllFlightsGivenAirport\" method=\"post\">\n" + 
-	    	 
-		  	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-			"				<tbody>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"Manage users\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetSales\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetReservations\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetRevenue\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetFlightHistory\" /></td>\n" + 
-			"					</tr>\n" + 
-			"					<tr style=\"height: 27px;\">\n" + 
-			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-			"							name=\"click\" type=\"submit\" value=\"GetAllFlights\" /></td>\n" + 
-			"					</tr>\n" + 
-			"\n" + 
-			"				</tbody>\n" + 
-			"			</table></div>\n"+
+	    			"<body>\n" + "<p align=center>Get All Flights</p>" +
+	    			navbarhtml +
+	    			 "	<form action=\"AllFlightsGivenAirport\" method=\"post\">\n" +
 			
 	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
 	"				<tbody>\n" + 
 	"					<tr style=\"height: 27px;\">\n" + 
-	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Search for airport</td>\n";
+	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Flights For Airport: </td>\n";
 	
 	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
 	    	
@@ -110,7 +78,7 @@ public class AllFlightsGivenAirport extends HttpServlet {
 	
 	
 	
-	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Search\" /></td>\n"+
+	str += "						<td>	<input name=\"click\" type=\"Submit\" value=\"Submit\" /></td>\n"+
 	"					</tr>\n" + 
 	"\n" + 
 	"				</tbody>\n" + 
@@ -155,8 +123,8 @@ public class AllFlightsGivenAirport extends HttpServlet {
 	}
   
   protected void finishHtml(java.io.PrintWriter out) {
-    	String str = "<div>\n" + 
-    			"		<br> <br> <br> <br>\n" + 
+    	String str = //"<div>\n" + 
+//    			"		<br> <br> <br> <br>\n" + 
 //    			"		<p>Add Airport</p>\n" + 
 //    			"		<table border=\"2\">\n" + 
 //    			"			<tbody>\n" + 
@@ -172,6 +140,7 @@ public class AllFlightsGivenAirport extends HttpServlet {
 //    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
 //    			"	</div>\n" + 
     			"	</form>\n" + 
+    			//"<p>${error}</p>"+
     			"</body>\n" + 
     			"</html>";
     	out.write(str);
@@ -200,10 +169,12 @@ public class AllFlightsGivenAirport extends HttpServlet {
 			initialHtml(response.getWriter(), rs2);
 			PreparedStatement stmt;	
 			if(this.getCode().length() > 0) {
-				stmt=con.prepareStatement("Select fit.FlightNumber, fit.AirlineName, fit.DepartureCity, fit.DestinationCity, fit.DepartureTime, fit.ArrivalTime from AirportTable ait join FlightInfoTable fit on (ait.AirportCode = fit.DepartureCity) where ait.AirportCode = ? union "
-						+ "Select fit.FlightNumber, fit.AirlineName, fit.DepartureCity, fit.DestinationCity, fit.DepartureTime, fit.ArrivalTime from AirportTable ait join FlightInfoTable fit on (ait.AirportCode = fit.DestinationCity) where ait.AirportCode = ? group by FlightNumber");  
+				stmt=con.prepareStatement("select ft.FlightNumber \n" + 
+						"from FlightsTable ft\n" + 
+						"join FlightInfoTable fit using (FlightNumber)\n" + 
+						"join AirportTable airt on (fit.DepartureCity = airt.AirportCode)\n" + 
+						"where airt.AirportCode = ?");  
 				stmt.setString(1, this.getCode());
-				stmt.setString(2, getCode());
 				ResultSet rs = stmt.executeQuery();
 				makeTable(rs, response.getWriter());
 			}
@@ -215,22 +186,55 @@ public class AllFlightsGivenAirport extends HttpServlet {
 			System.out.println(e.getMessage());
 		}
 	}
-
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-//		String className = "ManageAirlines";
+    String className = "ManageAirlines";
 		//navigation
-		if(request.getParameter("click").equals("Search")) {
-			String code = request.getParameter("Code");
-			if(code != null) {
-				this.setCode(code);
-			}
+		if(request.getParameter("click").equals("BookUser")) {
+			response.sendRedirect("BookUser");
+			return;
 		}
-		
-		doGet(request, response);
+		if(request.getParameter("click").equals("ChangeFlight")) {
+			response.sendRedirect("ChangeFlight");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageFlights")) {
+			response.sendRedirect("ManageFlights");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageAirlines")) {
+			
+		}
+		if(request.getParameter("click").equals("ManageAirports")) {
+			response.sendRedirect("ManageAirports");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageAirplanes")) {
+			response.sendRedirect("ManageAirplanes");
+			return;
+		}
+		if(request.getParameter("click").equals("GetWaitlist")) {
+			response.sendRedirect("GetWaitlist");
+			return;
+		}
+		if(request.getParameter("click").equals("GetAllFlights")) {
+			response.sendRedirect("AllFlightsGivenAirport");
+			return;
+		}
+		if(request.getParameter("click").equals("Submit")) {
+			String airportName = request.getParameter("Code");
+			System.out.println(airportName);
+			setCode(airportName);
+			doGet(request, response);
+			return;
+		}	
+		if(request.getParameter("click").equals("Customer - Most Revenue")) {
+			response.sendRedirect("CustomerWithMostRevenue");
+			return;
+		}
 	}
 
 }

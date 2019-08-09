@@ -16,7 +16,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
-
 /**
  * Servlet implementation class RevenueByAirline
  */
@@ -27,29 +26,28 @@ public class RevenueByAirline extends HttpServlet {
     /**
      * @see HttpServlet#HttpServlet()
      */
-     
-	private String airlineCode = "";
+     private String aic = "";
 	
 	private void setCode(String code) {
-		airlineCode = code;
+		aic = code;
 	}
 	
 	private String getCode() {
-		return airlineCode;
+		return aic;
 	}
-     
-     protected void initialHtml(java.io.PrintWriter out, ResultSet airline) throws SQLException {
+	
+     protected void initialHtml(java.io.PrintWriter out, ResultSet airport) {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
 	    			"<head>\n" + 
 	    			"<meta charset=\"UTF-8\">\n" + 
-	    			"<title>Revenue by Airlinet</title>\n" + 
+	    			"<title>Amount of sale by airline</title>\n" + 
 	    			"</head>\n" + 
 	    			"<body>\n" + 
 	    			"	<form action=\"RevenueByAirline\" method=\"post\">\n" + 
 	    	 
-		  	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
+	    		"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
 			"				<tbody>\n" + 
 			"					<tr style=\"height: 27px;\">\n" + 
 			"						<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
@@ -82,29 +80,34 @@ public class RevenueByAirline extends HttpServlet {
 	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
 	"				<tbody>\n" + 
 	"					<tr style=\"height: 27px;\">\n" + 
-	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Search for Airline</td>\n";
+	"						<td style=\"width: 260px; height: 27px; text-align: center;\">Search for airport</td>\n";
 	
 	    	str += "<td width = \"14%\"><select name = \"Code\" size = \"1\">";
 	    	
 	    	
 	    	
 	    	//departure
-	    	while(airline.next()) {
-	    		//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
-	    		try {
-	    			if (airline.getString("Name").equals(this.getCode())) {
-						String option = "<option value = \"" + airline.getString("Name") + "\" selected>"
-								+ airline.getString("Name") + "</option>\n";
+	    	try {
+				while(airport.next()) {
+					//String option= "<option value = \"" + aircraft.getString("TailNumber") + "\"" + aircraft.getString("TailNumber") + "</option>";\
+					try {
+						if (airport.getString("AirportCode").equals(this.getCode())) {
+							String option = "<option value = \"" + airport.getString("AirportCode") + "\" selected>"
+									+ airport.getString("AirportName") + "</option>\n";
+							str += option;
+						} else {
+						String option = "<option value = \"" + airport.getString("AirportCode") + "\">" + airport.getString("AirportName") + "</option>\n";
 						str += option;
-					} else {
-	    			String option = "<option value = \"" + airline.getString("Name") + "\">" + airline.getString("Name") + "</option>\n";
-	    			str += option;
+						}
 					}
-	    		}
-	    		catch(Exception e) {
-	    			System.out.print(e.getMessage());
-	    		}
-	    	}
+					catch(Exception e) {
+						System.out.print(e.getMessage());
+					}
+				}
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 	    	str += "</select></td>";
 	
 	
@@ -157,26 +160,26 @@ public class RevenueByAirline extends HttpServlet {
   protected void finishHtml(java.io.PrintWriter out) {
     	String str = "<div>\n" + 
     			"		<br> <br> <br> <br>\n" + 
-//    			"		<p>Add Airport</p>\n" + 
-//    			"		<table border=\"2\">\n" + 
-//    			"			<tbody>\n" + 
-//    			"				<tr>\n" + 
-//    			"					<td>Airline Name</td>\n" +		
-//    			"				</tr>\n" + 
-//    			"				<tr>\n" + 
-//    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
-//    			"				</tr>\n" + 
-//    			"			</tbody>\n" + 
-//    			"		</table>\n" + 
-//    			"		\n" + 
-//    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
-//    			"	</div>\n" + 
+    			"		<p>Add Airport</p>\n" + 
+    			"		<table border=\"2\">\n" + 
+    			"			<tbody>\n" + 
+    			"				<tr>\n" + 
+    			"					<td>Airline Name</td>\n" +		
+    			"				</tr>\n" + 
+    			"				<tr>\n" + 
+    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
+    			"				</tr>\n" + 
+    			"			</tbody>\n" + 
+    			"		</table>\n" + 
+    			"		\n" + 
+    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
+    			"	</div>\n" + 
     			"	</form>\n" + 
+    			"<p>${error}</p>"+
     			"</body>\n" + 
     			"</html>";
     	out.write(str);
     }
-
 
     public RevenueByAirline() {
         super();
@@ -194,24 +197,15 @@ public class RevenueByAirline extends HttpServlet {
 			Connection con=DriverManager.getConnection(  
 			"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
 			
-			PreparedStatement stmt=con.prepareStatement("select Name from AirlineTable");  
+			PreparedStatement stmt;	
+			
+			stmt=con.prepareStatement("select at.AirlineName, at.AirlineID, sum(rft.BookedPrice) from AirlineTable at join ReservationsFlightsTable rft using (AirlineID) group by at.AirlineID");  
+			
+			
 			ResultSet rs = stmt.executeQuery();
-			initialHtml(response.getWriter(), rs);
 			
-			
-			if(this.airlineCode.length() >0) {
-				PreparedStatement stmt2 = con.prepareStatement("Select sum(rft.bookedPrice) from ReservationsFlightsTable rft join " + 
-						"	FlightsTable ft on(rft.FlightsID = ft.FlightsID) join\n" + 
-						"    FlightInfoTable fit on (ft.FlightNumber = fit.FlightNumber) where fit.AirlineName = ?");
-				
-				stmt2.setString(1, this.getCode());
-				ResultSet rs2 = stmt2.executeQuery();
-				makeTable(rs2, response.getWriter());
-			}
-			
-			
-			
-			//makeTable(rs, response.getWriter());
+			initialHtml(response.getWriter(),rs);
+			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());
 			con.close();
@@ -226,13 +220,92 @@ public class RevenueByAirline extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-   
+    String className = "ManageAirlines";
 		//navigation
-		if(request.getParameter("click").equals("Search")) {
-			String code = request.getParameter("Code");
-			if(code != null) {
-				this.setCode(code);
+		if(request.getParameter("click").equals("BookUser")) {
+			response.sendRedirect("BookUser");
+			return;
+		}
+		if(request.getParameter("click").equals("ChangeFlight")) {
+			response.sendRedirect("ChangeFlight");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageFlights")) {
+			response.sendRedirect("ManageFlights");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageAirlines")) {
+			
+		}
+		if(request.getParameter("click").equals("ManageAirports")) {
+			response.sendRedirect("ManageAirports");
+			return;
+		}
+		if(request.getParameter("click").equals("ManageAirplanes")) {
+			response.sendRedirect("ManageAirplanes");
+			return;
+		}
+		if(request.getParameter("click").equals("GetWaitlist")) {
+			response.sendRedirect("GetWaitlist");
+		}
+		
+		
+		
+		
+		if(request.getParameter("click").equals("Add Airline")) {
+			String name = "";
+			
+			
+			String error = "";
+
+			
+			
+			if(request.getParameter("Name") != null) {
+				name = request.getParameter("Name");
+			}else {
+				error = "Airport name cannot be empty. ";
 			}
+			
+			if(error.length() > 0) {
+				
+			}
+			else {
+				try {
+					Class.forName("com.mysql.jdbc.Driver");  
+					Connection con=DriverManager.getConnection(  
+					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
+					PreparedStatement stmt=con.prepareStatement("Insert into AirlineTable (Name) Values (?)");  
+				
+					//RequestDispatcher dispatcher;
+					stmt.setString(1, name);
+					
+					
+					int count = stmt.executeUpdate();
+					if(count > 0) {
+						System.out.println("Inserted");
+					}
+					con.close();
+				}catch(Exception e) {
+					System.out.println(e.getMessage());
+				}
+					
+			}
+			doGet(request, response);
+			return;
+		}
+		else {
+			String id = request.getParameter("click");
+			if(id != null) {
+				if(!id.equals(className)) {
+					//request.setAttribute("TailNumber", tailNumber);
+					RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirline");
+					request.setAttribute("_id", id);
+					dispatcher.forward( request, response);
+	//				response.sendRedirect("EditAirplane");
+					return;
+				}
+			}
+			
 		}
 		doGet(request, response);
 	}

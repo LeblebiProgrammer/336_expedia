@@ -16,65 +16,40 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.mysql.jdbc.ResultSetMetaData;
 
-
 /**
  * Servlet implementation class CustomerWithMostRevenue
  */
 @WebServlet("/CustomerWithMostRevenue")
-public class CustomerWithMostRevenue extends HttpServlet {
+public class CustomerWithMostRevenue extends HttpServlet implements NavigationBar {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
+	private String aic = "";
+	
+	private void setCode(String code) {
+		aic = code;
+	}
+	
+	private String getCode() {
+		return aic;
+	}
      
-     protected void initialHtml(java.io.PrintWriter out) {
+      protected void initialHtml(java.io.PrintWriter out, ResultSet airport) throws SQLException {
 	    	String str = "\n" + 
 	    			"<!DOCTYPE html>\n" + 
 	    			"<html>\n" + 
 	    			"<head>\n" + 
 	    			"<meta charset=\"UTF-8\">\n" + 
-	    			"<title>Manage Airlines</title>\n" + 
+	    			"<title>Customer who generated the most revenue</title>\n" + 
 	    			"</head>\n" + 
-	    			"<body>\n" + 
-	    			"	<form action=\"ManageAirlines\" method=\"post\">\n" + 
-	    	 
-	    	"			<table style=\"height: 51px; width: 100px; float: left;\" border=\"1\">\n" + 
-	    	"				<tbody>\n" + 
-	    	"<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"BookUser\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ChangeFlight\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageFlights\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirports\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirlines\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"ManageAirplanes\" /></td>\n" + 
-	    	"				</tr>\n" + 
-	    	"				<tr style=\"height: 27px;\">\n" + 
-	    	"					<td style=\"width: 260px; height: 27px; text-align: center;\"><input\n" + 
-	    	"						name=\"click\" type=\"submit\" value=\"GetWaitlist\" /></td>\n" + 
-	    	"				</tr>"+
-	    	"				</tbody>\n" + 
-	    	"			</table></div>\n" ;
-	    	
+	    			"<body>\n" +
+	    			"<p align=center>Customer - Most Revenue</p>" +
+	    			navbarhtml + 
+			"			</table></div>\n";
 	    	out.print(str);
 	    }
-      
       private int makeTable(java.sql.ResultSet rs, java.io.PrintWriter out)
     	    throws Exception {
 		 int rowCount = 0;
@@ -109,27 +84,7 @@ public class CustomerWithMostRevenue extends HttpServlet {
 	}
   
   protected void finishHtml(java.io.PrintWriter out) {
-    	String str = "<div>\n" + 
-    			"		<br> <br> <br> <br>\n" + 
-    			"		<p>Add Airport</p>\n" + 
-    			"		<table border=\"2\">\n" + 
-    			"			<tbody>\n" + 
-    			"				<tr>\n" + 
-    			"					<td>Airline Name</td>\n" +		
-    			"				</tr>\n" + 
-    			"				<tr>\n" + 
-    			"					<td><input type=\"text\" name=\"Name\" /></td>\n" + 			
-    			"				</tr>\n" + 
-    			"			</tbody>\n" + 
-    			"		</table>\n" + 
-    			"		\n" + 
-    			"		<input type=\"submit\" name = \"click\" value=\"Add Airline\" />\n" + 
-    			"	</div>\n" + 
-    			"	</form>\n" + 
-    			"<p>${error}</p>"+
-    			"</body>\n" + 
-    			"</html>";
-    	out.write(str);
+    	
     }
 
     public CustomerWithMostRevenue() {
@@ -150,12 +105,19 @@ public class CustomerWithMostRevenue extends HttpServlet {
 			
 			PreparedStatement stmt;	
 			
-			stmt=con.prepareStatement("create temporary table t select ID, sum(BookedPrice) as Revenue from Reservation group by ID select t.ID from t where t.ID = (select max(t.Revenue) from t)");  
+			stmt=con.prepareStatement("select t.UserID, t.FirstName, t.LastName, MAX(t.totalRevenue) as Revenue\n" + 
+					"from\n" + 
+					"(\n" + 
+					"	select rt.UserID, ut.FirstName, ut.LastName, SUM(BookedPrice) as totalRevenue\n" + 
+					"	from ReservationTable rt\n" + 
+					"	join ReservationsFlightsTable rft using (ReservationNumber)\n" + 
+					"    join UserTable ut on (rt.UserID = ut.ID)\n" + 
+					"	group by (UserID)) as t");  
 			
 			
 			ResultSet rs = stmt.executeQuery();
 			
-			initialHtml(response.getWriter());
+			initialHtml(response.getWriter(), rs);
 			makeTable(rs, response.getWriter());
 
 			finishHtml(response.getWriter());
@@ -199,65 +161,15 @@ public class CustomerWithMostRevenue extends HttpServlet {
 		if(request.getParameter("click").equals("GetWaitlist")) {
 			response.sendRedirect("GetWaitlist");
 		}
-		
-		
-		
-		
-		if(request.getParameter("click").equals("Add Airline")) {
-			String name = "";
-			
-			
-			String error = "";
-
-			
-			
-			if(request.getParameter("Name") != null) {
-				name = request.getParameter("Name");
-			}else {
-				error = "Airport name cannot be empty. ";
-			}
-			
-			if(error.length() > 0) {
-				
-			}
-			else {
-				try {
-					Class.forName("com.mysql.jdbc.Driver");  
-					Connection con=DriverManager.getConnection(  
-					"jdbc:mysql://cs336-summer19db.cfgjjfomqrbi.us-east-2.rds.amazonaws.com/RuExpedia","ssg103","password");   
-					PreparedStatement stmt=con.prepareStatement("Insert into AirlineTable (Name) Values (?)");  
-				
-					//RequestDispatcher dispatcher;
-					stmt.setString(1, name);
-					
-					
-					int count = stmt.executeUpdate();
-					if(count > 0) {
-						System.out.println("Inserted");
-					}
-					con.close();
-				}catch(Exception e) {
-					System.out.println(e.getMessage());
-				}
-					
-			}
-			doGet(request, response);
+		if(request.getParameter("click").equals("GetAllFlights")) {
+			response.sendRedirect("AllFlightsGivenAirport");
 			return;
 		}
-		else {
-			String id = request.getParameter("click");
-			if(id != null) {
-				if(!id.equals(className)) {
-					//request.setAttribute("TailNumber", tailNumber);
-					RequestDispatcher dispatcher = request.getRequestDispatcher("EditAirline");
-					request.setAttribute("_id", id);
-					dispatcher.forward( request, response);
-	//				response.sendRedirect("EditAirplane");
-					return;
-				}
-			}
-			
+		if(request.getParameter("click").equals("Customer - Most Revenue")) {
+			response.sendRedirect("CustomerWithMostRevenue");
+			return;
 		}
+		
 		doGet(request, response);
 	}
 
