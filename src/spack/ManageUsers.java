@@ -42,7 +42,8 @@ public class ManageUsers extends HttpServlet implements NavigationBar{
     			"<title>Manage Users</title>\n" + 
     			"</head>\n" + 
     			"<body>\n" + 
-    			navbarhtml;
+    			navbarhtml + 
+    			"<form action=\"ManageUsers\" method=\"post\">";
     	
     	out.print(str);
     }
